@@ -29,6 +29,6 @@ Bu proje modern web teknolojileri ve hafif bir yapı ile inşa edilmiştir:
 - **Veri Yapısı:** 800 kelimelik optimize edilmiş JSON veri seti.
 
 ## Ekran Görüntüleri
-![BlitzFlash Ekran Görüntüsü](1.jpg)
-![BlitzFlash Ekran Görüntüsü](2.jpg)
-![BlitzFlash Ekran Görüntüsü](3.jpg)
+![BlitzFlash Ekran Görüntüsü](anasayfa.jpg)
+![BlitzFlash Ekran Görüntüsü](serbestmod.jpg)
+![BlitzFlash Ekran Görüntüsü](surelimod.jpg)
