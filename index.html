@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="tr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BlitzFlash - İngilizce Kelime Öğren</title>
+    <meta name="description" content="BlitzFlash - İngilizce kelime öğrenmek için interaktif flashcard uygulaması">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+
+<body>
+    <div class="background-effects">
+        <div class="gradient-orb orb-1"></div>
+        <div class="gradient-orb orb-2"></div>
+        <div class="gradient-orb orb-3"></div>
+    </div>
+
+    <header class="header">
+        <div class="logo">
+            <span class="logo-icon">⚡</span>
+            <span class="logo-text">BlitzFlash</span>
+        </div>
+        <div class="stats">
+            <div class="stat-item stat-correct">
+                <span class="stat-number" id="correct-count">0</span>
+                <span class="stat-label">✓ Bildim</span>
+            </div>
+            <div class="stat-item stat-wrong">
+                <span class="stat-number" id="wrong-count">0</span>
+                <span class="stat-label">✗ Bilemedim</span>
+            </div>
+            <div class="stat-item">
+                <span class="stat-number" id="total-count">0</span>
+                <span class="stat-label">Toplam</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- Mode Selection Screen -->
+    <div class="mode-screen" id="mode-screen">
+        <div class="mode-container">
+            <h1 class="mode-title">⚡ BlitzFlash</h1>
+            <p class="mode-subtitle">Nasıl çalışmak istiyorsun?</p>
+
+            <div class="mode-options">
+                <button class="mode-btn" id="free-mode-btn">
+                    <span class="mode-icon">📚</span>
+                    <span class="mode-name">Serbest Mod</span>
+                    <span class="mode-desc">Süresiz, kendi hızında çalış</span>
+                </button>
+
+                <button class="mode-btn" id="timed-mode-btn">
+                    <span class="mode-icon">⏱️</span>
+                    <span class="mode-name">Süreli Mod</span>
+                    <span class="mode-desc">Zamana karşı yarış!</span>
+                </button>
+            </div>
+
+            <!-- Time Selection (hidden by default) -->
+            <div class="time-selection hidden" id="time-selection">
+                <p class="time-title">Süre Seç:</p>
+                <div class="time-options">
+                    <button class="time-btn" data-time="10">10 sn</button>
+                    <button class="time-btn" data-time="30">30 sn</button>
+                    <button class="time-btn" data-time="60">60 sn</button>
+                    <button class="time-btn" data-time="120">2 dk</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Countdown Overlay -->
+    <div class="countdown-overlay hidden" id="countdown-overlay">
+        <div class="countdown-number" id="countdown-number">3</div>
+    </div>
+
+    <!-- Game Results Screen -->
+    <div class="results-screen hidden" id="results-screen">
+        <div class="results-container">
+            <h1 class="results-title">⏱️ Süre Doldu!</h1>
+            <div class="results-score" id="results-score">0</div>
+            <p class="results-label">PUAN</p>
+            <div class="results-stats">
+                <div class="result-stat correct">
+                    <span class="result-number" id="result-correct">0</span>
+                    <span class="result-label">Doğru</span>
+                </div>
+                <div class="result-stat wrong">
+                    <span class="result-number" id="result-wrong">0</span>
+                    <span class="result-label">Yanlış</span>
+                </div>
+            </div>
+            <button class="btn btn-flip" id="play-again-btn">Tekrar Oyna</button>
+        </div>
+    </div>
+
+    <main class="main-content hidden" id="game-area">
+        <!-- Back Button -->
+        <button class="back-btn" id="back-btn">← Geri</button>
+
+        <!-- Timer Display -->
+        <div class="timer-display hidden" id="timer-display">
+            <span class="timer-icon">⏱️</span>
+            <span class="timer-value" id="timer-value">00:00</span>
+        </div>
+
+        <!-- Swipe Indicators -->
+        <div class="swipe-indicators">
+            <div class="swipe-indicator swipe-left">
+                <span class="indicator-icon">✗</span>
+                <span>Bilemedim</span>
+            </div>
+            <div class="swipe-indicator swipe-right">
+                <span class="indicator-icon">✓</span>
+                <span>Bildim</span>
+            </div>
+        </div>
+
+        <div class="card-container">
+            <div class="flashcard" id="flashcard">
+                <div class="card-inner" id="card-inner">
+                    <!-- Front Side - English -->
+                    <div class="card-front">
+                        <div class="card-badge">English</div>
+                        <h1 class="word" id="english-word">Loading...</h1>
+                        <p class="sentence" id="english-sentence">Loading example sentence...</p>
+                        <div class="hint">
+                            <span class="hint-icon">👆</span>
+                            <span>Çevirmek için tıkla</span>
+                        </div>
+                    </div>
+                    <!-- Back Side - Turkish -->
+                    <div class="card-back">
+                        <div class="card-badge badge-tr">Türkçe</div>
+                        <h1 class="word" id="turkish-word">Yükleniyor...</h1>
+                        <p class="sentence" id="turkish-sentence">Örnek cümle yükleniyor...</p>
+                        <div class="hint">
+                            <span class="hint-icon">🔄</span>
+                            <span>Geri dönmek için tıkla</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button class="btn btn-wrong" id="wrong-btn">
+                <span class="btn-icon">✗</span>
+                Bilemedim
+            </button>
+            <button class="btn btn-flip" id="flip-btn">
+                <span class="btn-icon">🔄</span>
+                Çevir
+            </button>
+            <button class="btn btn-correct" id="correct-btn">
+                Bildim
+                <span class="btn-icon">✓</span>
+            </button>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+            <span class="progress-text" id="progress-text">0 / 0</span>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>⚡ Hızlı öğren, hızlı ilerle! Sağa kaydır = Bildim, Sola kaydır = Bilemedim</p>
+    </footer>
+
+    <script src="words.js"></script>
+    <script src="words_part1.js"></script>
+    <script src="words_part2.js"></script>
+    <script src="words_part3.js"></script>
+    <script src="words_part4.js"></script>
+    <script src="words_part5.js"></script>
+    <script src="words_part6.js"></script>
+    <script src="words_part7.js"></script>
+    <script src="app.js"></script>
+</body>
+
+</html>
