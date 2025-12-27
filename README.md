@@ -1,5 +1,9 @@
 # ⚡ BlitzFlash
 
+## 🚀 Canlı Demo
+Uygulamayı tarayıcınızda hemen deneyin: [BlitzFlash'ı Başlat](https://blitzflash.yildirimyigit.com/)
+
+
 BlitzFlash, İngilizce kelime dağarcığını en verimli şekilde geliştirmek için tasarlanmış, bilimsel temelli ve oyunlaştırılmış bir flashcard (kelime kartı) uygulamasıdır.
 
 ## 🎯 Projenin Amacı ve Bilimsel Temeli
