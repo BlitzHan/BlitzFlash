@@ -1,10 +1,9 @@
 # ⚡ BlitzFlash
 
+BlitzFlash, İngilizce kelime dağarcığını en verimli şekilde geliştirmek için tasarlanmış, bilimsel temelli ve oyunlaştırılmış bir flashcard (kelime kartı) uygulamasıdır.
+
 ## 🚀 Canlı Demo
 Uygulamayı tarayıcınızda hemen deneyin: [BlitzFlash'ı Başlat](https://blitzflash.yildirimyigit.com/)
-
-
-BlitzFlash, İngilizce kelime dağarcığını en verimli şekilde geliştirmek için tasarlanmış, bilimsel temelli ve oyunlaştırılmış bir flashcard (kelime kartı) uygulamasıdır.
 
 ## 🎯 Projenin Amacı ve Bilimsel Temeli
 Bu proje, rastgele kelimeler yerine **Stuart Webb (University of Western Ontario)** tarafından yürütülen ve [BBC News](https://www.bbc.com/news/world-44569277) üzerinde paylaşılan araştırmayı temel alır. 
