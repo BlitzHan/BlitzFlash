@@ -1,22 +1,36 @@
 # ⚡ BlitzFlash
 
-BlitzFlash, İngilizce kelime öğrenme sürecini hem eğitici hem de eğlenceli hale getiren, iki farklı oyun moduna sahip etkileşimli bir web uygulamasıdır.
+BlitzFlash, İngilizce kelime dağarcığını en verimli şekilde geliştirmek için tasarlanmış, bilimsel temelli ve oyunlaştırılmış bir flashcard (kelime kartı) uygulamasıdır.
 
-### 🎮 Oyun Modları
+## 🎯 Projenin Amacı ve Bilimsel Temeli
+Bu proje, rastgele kelimeler yerine **Stuart Webb (University of Western Ontario)** tarafından yürütülen ve [BBC News](https://www.bbc.com/news/world-44569277) üzerinde paylaşılan araştırmayı temel alır. 
 
-| Mod | Açıklama | Hedef |
-| :--- | :--- | :--- |
-| **🌿 Serbest Mod** | Zaman sınırı olmadan kartlar arasında gezinebilirsiniz. | Ezber ve Tanıma |
-| **⏱️ Süreli Yarışma** | Geri sayım bitmeden en yüksek kelimeyi bilmeye çalışın. | Hız ve Pekiştirme |
+* **800 Kelime Kuralı:** Araştırmalar, bir dilde en sık kullanılan 800-1000 kelimeyi öğrenmenin, günlük konuşmaların **%75'ini** anlamak için yeterli olduğunu göstermektedir.
+* **Verimlilik:** BlitzFlash, kullanıcının en az çabayla en yüksek günlük konuşma hakimiyetine ulaşmasını hedefler.
 
-### ✨ Öne Çıkan Özellikler
-* **Puan Sistemi:** Süreli modda her doğru cevap puan kazandırır.
-* **Etkileşimli Kartlar:** Kelimenin üzerine tıklayarak anlamını anında görüntüleme.
-* **Responsive Tasarım:** Hem mobil hem de masaüstü cihazlarda akıcı kullanım.
-* **Hafif Altyapı:** Antigravity framework'ü ile optimize edilmiş performans.
+## 🎮 Oyun Modları
 
-### 🛠️ Teknik Detaylar
-Bu projede aşağıdaki yapılar uygulanmıştır:
-- **State Management:** Oyun modları arasındaki geçiş ve puan takibi.
-- **Timer Logic:** Süreli mod için asenkron geri sayım yönetimi.
-- **DOM Manipulation:** Dinamik kart güncellemeleri.
+Uygulama, öğrenme sürecini farklı ihtiyaçlara göre ikiye ayırır:
+
+1.  **🌿 Serbest Mod (Free Study):**
+    * Zaman sınırı yok.
+    * Kelimeleri kendi hızınızda inceleyin.
+    * Kartın üzerine tıklayarak Türkçe/İngilizce karşılıkları arasında geçiş yapın.
+
+2.  **⏱️ Süreli Yarışma (Timed Challenge):**
+    * Zamanla yarışın!
+    * Belirli bir süre içinde ne kadar çok kelime bilirseniz o kadar yüksek puan kazanırsınız.
+    * Hızlı düşünme ve anında hatırlama yeteneğinizi geliştirin.
+
+## 🛠️ Kullanılan Teknolojiler
+Bu proje modern web teknolojileri ve hafif bir yapı ile inşa edilmiştir:
+- **Framework:** [Antigravity](https://github.com/...) (Hızlı ve performanslı logic yönetimi)
+- **Frontend:** HTML5, CSS3 ve JavaScript (ES6+)
+- **Veri Yapısı:** 800 kelimelik optimize edilmiş JSON veri seti.
+
+## 🚀 Kurulum ve Kullanım
+Projeyi yerel bilgisayarınızda çalıştırmak için:
+
+1. Bu depoyu klonlayın:
+   ```bash
+   git clone [https://github.com/kullaniciadi/BlitzFlash.git](https://github.com/kullaniciadi/BlitzFlash.git)
