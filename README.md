@@ -27,3 +27,8 @@ Bu proje modern web teknolojileri ve hafif bir yapı ile inşa edilmiştir:
 - **Framework:** [Antigravity](https://github.com/...) (Hızlı ve performanslı logic yönetimi)
 - **Frontend:** HTML5, CSS3 ve JavaScript (ES6+)
 - **Veri Yapısı:** 800 kelimelik optimize edilmiş JSON veri seti.
+
+## Ekran Görüntüleri
+![BlitzFlash Ekran Görüntüsü](1.jpg)
+![BlitzFlash Ekran Görüntüsü](2.jpg)
+![BlitzFlash Ekran Görüntüsü](3.jpg)
