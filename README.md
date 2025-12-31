@@ -2,7 +2,7 @@
 
 BlitzFlash, İngilizce kelime öğrenmeyi eğlenceli ve etkili hale getiren modern bir flashcard uygulamasıdır. BBC 800 Essential Words listesi temel alınarak hazırlanmıştır.
 
-![BlitzFlash Screenshot](https://img.shields.io/badge/Version-1.0-blue) ![License](https://img.shields.io/badge/License-MIT-green)
+![BlitzFlash](https://img.shields.io/badge/Version-1.0-blue)
 
 ## � Canlı Demo
 
@@ -79,18 +79,6 @@ blitzflash/
 - CSS3 (Animations, Flexbox, Grid)
 - Vanilla JavaScript (ES6+)
 - Google Fonts (Inter)
-
-## 📝 Lisans
-
-Bu proje MIT lisansı altında lisanslanmıştır.
-
-## 🤝 Katkıda Bulunma
-
-1. Bu repository'yi fork edin
-2. Feature branch'i oluşturun (`git checkout -b feature/yeni-ozellik`)
-3. Değişikliklerinizi commit edin (`git commit -m 'Yeni özellik eklendi'`)
-4. Branch'i push edin (`git push origin feature/yeni-ozellik`)
-5. Pull Request açın
 
 ---
 
