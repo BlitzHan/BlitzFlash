@@ -312,3 +312,343 @@ flashcard.addEventListener('touchend', (e) => {
         else markCorrect();
     }
 }, { passive: true });
+
+// ===== TYPING GAME MODE =====
+const typingGameScreen = document.getElementById('typing-game-screen');
+const typingModeBtn = document.getElementById('typing-mode-btn');
+const typingHomeBtn = document.getElementById('typing-home-btn');
+const typingBadge = document.getElementById('typing-badge');
+const typingWord = document.getElementById('typing-word');
+const typingSentence = document.getElementById('typing-sentence');
+const typingInput = document.getElementById('typing-input');
+const typingSubmit = document.getElementById('typing-submit');
+const typingFeedback = document.getElementById('typing-feedback');
+const feedbackIcon = document.getElementById('feedback-icon');
+const feedbackText = document.getElementById('feedback-text');
+const typingCorrectCount = document.getElementById('typing-correct-count');
+const typingWrongCount = document.getElementById('typing-wrong-count');
+const typingProgressText = document.getElementById('typing-progress-text');
+
+let typingCurrentIndex = 0;
+let typingCorrect = 0;
+let typingWrong = 0;
+let typingShuffledWords = [];
+let typingCurrentWord = null;
+let typingIsEnglish = true; // true = showing English, need Turkish answer
+
+function startTypingMode() {
+    modeScreen.classList.add('hidden');
+    typingGameScreen.classList.remove('hidden');
+
+    typingShuffledWords = shuffleArray(getAllWords());
+    typingCurrentIndex = 0;
+    typingCorrect = 0;
+    typingWrong = 0;
+    typingCorrectCount.textContent = '0';
+    typingWrongCount.textContent = '0';
+
+    displayTypingWord();
+}
+
+function displayTypingWord() {
+    if (typingCurrentIndex >= typingShuffledWords.length) {
+        showTypingCompletion();
+        return;
+    }
+
+    typingCurrentWord = typingShuffledWords[typingCurrentIndex];
+
+    // Randomly decide to show English or Turkish (50/50)
+    typingIsEnglish = Math.random() > 0.5;
+
+    if (typingIsEnglish) {
+        typingBadge.textContent = 'English';
+        typingBadge.classList.remove('turkish');
+        typingWord.textContent = typingCurrentWord.english;
+        typingSentence.textContent = typingCurrentWord.englishSentence;
+    } else {
+        typingBadge.textContent = 'Türkçe';
+        typingBadge.classList.add('turkish');
+        typingWord.textContent = typingCurrentWord.turkish;
+        typingSentence.textContent = typingCurrentWord.turkishSentence;
+    }
+
+    typingInput.value = '';
+    typingInput.focus();
+    typingFeedback.classList.add('hidden');
+    typingProgressText.textContent = `${typingCurrentIndex + 1} / ${typingShuffledWords.length}`;
+}
+
+function normalizeText(text) {
+    // Normalize for comparison: lowercase, trim, handle Turkish characters
+    return text.toLowerCase().trim()
+        .replace(/ı/g, 'i')
+        .replace(/ğ/g, 'g')
+        .replace(/ü/g, 'u')
+        .replace(/ş/g, 's')
+        .replace(/ö/g, 'o')
+        .replace(/ç/g, 'c')
+        .replace(/[^\w\s]/g, ''); // Remove punctuation
+}
+
+function checkTypingAnswer() {
+    const userAnswer = typingInput.value.trim();
+    if (!userAnswer) return;
+
+    let correctAnswer;
+    if (typingIsEnglish) {
+        // User needs to type Turkish
+        correctAnswer = typingCurrentWord.turkish;
+    } else {
+        // User needs to type English
+        correctAnswer = typingCurrentWord.english;
+    }
+
+    // Check if answer is correct (strict matching)
+    const normalizedUser = normalizeText(userAnswer);
+    const normalizedCorrect = normalizeText(correctAnswer);
+
+    // For translations with multiple meanings (e.g., "Sevgi / Aşk / Sevmek"), check each part
+    const correctParts = correctAnswer.split('/').map(part => normalizeText(part.trim()));
+
+    // User answer must exactly match one of the correct parts
+    const isCorrect = correctParts.some(part => part === normalizedUser) ||
+        normalizedCorrect === normalizedUser;
+
+    showTypingFeedback(isCorrect, correctAnswer);
+}
+
+function showTypingFeedback(isCorrect, correctAnswer) {
+    typingFeedback.classList.remove('hidden', 'correct', 'wrong');
+
+    if (isCorrect) {
+        typingFeedback.classList.add('correct');
+        feedbackIcon.textContent = '✓';
+        feedbackText.textContent = 'Doğru!';
+        typingCorrect++;
+        typingCorrectCount.textContent = typingCorrect;
+    } else {
+        typingFeedback.classList.add('wrong');
+        feedbackIcon.textContent = '✗';
+        feedbackText.textContent = `Yanlış! Doğrusu: ${correctAnswer}`;
+        typingWrong++;
+        typingWrongCount.textContent = typingWrong;
+    }
+
+    // Move to next word after delay
+    setTimeout(() => {
+        typingCurrentIndex++;
+        displayTypingWord();
+    }, isCorrect ? 800 : 2000);
+}
+
+function showTypingCompletion() {
+    typingWord.textContent = '🎉 Tebrikler!';
+    typingBadge.textContent = 'Bitti';
+    typingSentence.textContent = `${typingCorrect} doğru, ${typingWrong} yanlış`;
+    typingInput.style.display = 'none';
+    typingSubmit.style.display = 'none';
+    typingFeedback.classList.remove('hidden', 'wrong');
+    typingFeedback.classList.add('correct');
+    feedbackIcon.textContent = '⭐';
+    feedbackText.textContent = `Puan: ${typingCorrect * 10}`;
+}
+
+function exitTypingMode() {
+    typingGameScreen.classList.add('hidden');
+    modeScreen.classList.remove('hidden');
+    typingInput.style.display = '';
+    typingSubmit.style.display = '';
+}
+
+// Typing mode event listeners
+const typingBackBtn = document.getElementById('typing-back-btn');
+typingModeBtn.addEventListener('click', startTypingMode);
+typingHomeBtn.addEventListener('click', exitTypingMode);
+typingBackBtn.addEventListener('click', exitTypingMode);
+typingSubmit.addEventListener('click', checkTypingAnswer);
+typingInput.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        checkTypingAnswer();
+    }
+});
+
+// ===== SENTENCE COMPLETION MODE =====
+const sentenceGameScreen = document.getElementById('sentence-game-screen');
+const sentenceModeBtn = document.getElementById('sentence-mode-btn');
+const sentenceHomeBtn = document.getElementById('sentence-home-btn');
+const sentenceText = document.getElementById('sentence-text');
+const sentenceOptions = document.getElementById('sentence-options');
+const sentenceCorrectCountEl = document.getElementById('sentence-correct-count');
+const sentenceWrongCountEl = document.getElementById('sentence-wrong-count');
+const sentenceProgressText = document.getElementById('sentence-progress-text');
+
+let sentenceCurrentIndex = 0;
+let sentenceCorrect = 0;
+let sentenceWrong = 0;
+let sentenceShuffledWords = [];
+let sentenceCurrentWord = null;
+let sentenceCorrectOptionIndex = 0;
+let sentenceCanClick = true;
+
+function startSentenceMode() {
+    modeScreen.classList.add('hidden');
+    sentenceGameScreen.classList.remove('hidden');
+
+    sentenceShuffledWords = shuffleArray(getAllWords());
+    sentenceCurrentIndex = 0;
+    sentenceCorrect = 0;
+    sentenceWrong = 0;
+    sentenceCorrectCountEl.textContent = '0';
+    sentenceWrongCountEl.textContent = '0';
+    sentenceCanClick = true;
+
+    displaySentenceQuestion();
+}
+
+function displaySentenceQuestion() {
+    if (sentenceCurrentIndex >= sentenceShuffledWords.length) {
+        showSentenceCompletion();
+        return;
+    }
+
+    sentenceCurrentWord = sentenceShuffledWords[sentenceCurrentIndex];
+    sentenceCanClick = true;
+
+    // Create sentence with blank
+    const sentence = sentenceCurrentWord.englishSentence;
+    const word = sentenceCurrentWord.english;
+
+    // Replace the word with a blank
+    const regex = new RegExp(`\\b${word}\\b`, 'gi');
+    const blankSentence = sentence.replace(regex, '<span class="blank">_____</span>');
+    sentenceText.innerHTML = blankSentence;
+
+    // Generate options (1 correct + 3 random wrong)
+    const options = generateSentenceOptions(word);
+    sentenceCorrectOptionIndex = options.correctIndex;
+
+    const optionBtns = sentenceOptions.querySelectorAll('.option-btn');
+    optionBtns.forEach((btn, i) => {
+        btn.textContent = options.words[i];
+        btn.classList.remove('correct', 'wrong');
+        btn.disabled = false;
+    });
+
+    sentenceProgressText.textContent = `${sentenceCurrentIndex + 1} / ${sentenceShuffledWords.length}`;
+}
+
+function generateSentenceOptions(correctWord) {
+    // Get 3 random wrong options from vocabulary
+    const wrongWords = [];
+    const allWords = getAllWords();
+
+    while (wrongWords.length < 3) {
+        const randomIndex = Math.floor(Math.random() * allWords.length);
+        const randomWord = allWords[randomIndex].english;
+
+        if (randomWord !== correctWord && !wrongWords.includes(randomWord)) {
+            wrongWords.push(randomWord);
+        }
+    }
+
+    // Combine and shuffle
+    const allOptions = [correctWord, ...wrongWords];
+
+    // Shuffle options
+    for (let i = allOptions.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [allOptions[i], allOptions[j]] = [allOptions[j], allOptions[i]];
+    }
+
+    // Find correct index after shuffle
+    const correctIndex = allOptions.indexOf(correctWord);
+
+    return {
+        words: allOptions,
+        correctIndex: correctIndex
+    };
+}
+
+function checkSentenceAnswer(selectedIndex) {
+    if (!sentenceCanClick) return;
+    sentenceCanClick = false;
+
+    const optionBtns = sentenceOptions.querySelectorAll('.option-btn');
+
+    // Disable all buttons
+    optionBtns.forEach(btn => btn.disabled = true);
+
+    if (selectedIndex === sentenceCorrectOptionIndex) {
+        // Correct answer
+        optionBtns[selectedIndex].classList.add('correct');
+        sentenceCorrect++;
+        sentenceCorrectCountEl.textContent = sentenceCorrect;
+
+        // Fill in the blank with correct word
+        const blank = sentenceText.querySelector('.blank');
+        if (blank) {
+            blank.textContent = sentenceCurrentWord.english;
+            blank.classList.add('filled');
+        }
+
+        setTimeout(() => {
+            sentenceCurrentIndex++;
+            displaySentenceQuestion();
+        }, 1000);
+    } else {
+        // Wrong answer
+        optionBtns[selectedIndex].classList.add('wrong');
+        optionBtns[sentenceCorrectOptionIndex].classList.add('correct');
+        sentenceWrong++;
+        sentenceWrongCountEl.textContent = sentenceWrong;
+
+        // Fill in blank with correct word
+        const blank = sentenceText.querySelector('.blank');
+        if (blank) {
+            blank.textContent = sentenceCurrentWord.english;
+            blank.classList.add('filled');
+        }
+
+        setTimeout(() => {
+            sentenceCurrentIndex++;
+            displaySentenceQuestion();
+        }, 2000);
+    }
+}
+
+function showSentenceCompletion() {
+    sentenceText.innerHTML = `🎉 Tebrikler! <br><small>${sentenceCorrect} doğru, ${sentenceWrong} yanlış - Puan: ${sentenceCorrect * 10}</small>`;
+
+    const optionBtns = sentenceOptions.querySelectorAll('.option-btn');
+    optionBtns.forEach((btn, i) => {
+        btn.style.display = 'none';
+        btn.disabled = true;
+    });
+}
+
+function exitSentenceMode() {
+    sentenceGameScreen.classList.add('hidden');
+    modeScreen.classList.remove('hidden');
+
+    // Reset option buttons visibility
+    const optionBtns = sentenceOptions.querySelectorAll('.option-btn');
+    optionBtns.forEach(btn => {
+        btn.style.display = '';
+        btn.classList.remove('correct', 'wrong');
+    });
+}
+
+// Sentence mode event listeners
+const sentenceBackBtn = document.getElementById('sentence-back-btn');
+sentenceModeBtn.addEventListener('click', startSentenceMode);
+sentenceHomeBtn.addEventListener('click', exitSentenceMode);
+sentenceBackBtn.addEventListener('click', exitSentenceMode);
+
+sentenceOptions.addEventListener('click', (e) => {
+    if (e.target.classList.contains('option-btn')) {
+        const index = parseInt(e.target.dataset.index);
+        checkSentenceAnswer(index);
+    }
+});

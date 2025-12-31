@@ -58,6 +58,18 @@
                     <span class="mode-name">Süreli Mod</span>
                     <span class="mode-desc">Zamana karşı yarış!</span>
                 </button>
+
+                <button class="mode-btn" id="typing-mode-btn">
+                    <span class="mode-icon">⌨️</span>
+                    <span class="mode-name">Yazarak Tahmin</span>
+                    <span class="mode-desc">Çeviriyi yazarak öğren!</span>
+                </button>
+
+                <button class="mode-btn" id="sentence-mode-btn">
+                    <span class="mode-icon">📝</span>
+                    <span class="mode-name">Cümle Tamamla</span>
+                    <span class="mode-desc">Doğru kelimeyi bul!</span>
+                </button>
             </div>
 
             <!-- Time Selection (hidden by default) -->
@@ -95,6 +107,87 @@
                 </div>
             </div>
             <button class="btn btn-flip" id="play-again-btn">Tekrar Oyna</button>
+        </div>
+    </div>
+
+    <!-- Typing Game Screen -->
+    <div class="typing-game-screen hidden" id="typing-game-screen">
+        <header class="game-header">
+            <div class="logo" id="typing-home-btn" style="cursor: pointer;">
+                <span class="logo-icon">⚡</span>
+                <span class="logo-text">BlitzFlash</span>
+            </div>
+            <div class="game-stats">
+                <div class="stat-item stat-correct">
+                    <span class="stat-number" id="typing-correct-count">0</span>
+                    <span class="stat-label">✓ Doğru</span>
+                </div>
+                <div class="stat-item stat-wrong">
+                    <span class="stat-number" id="typing-wrong-count">0</span>
+                    <span class="stat-label">✗ Yanlış</span>
+                </div>
+            </div>
+        </header>
+        <button class="back-btn" id="typing-back-btn">← Geri</button>
+
+        <div class="typing-card-container">
+            <div class="typing-card">
+                <div class="typing-badge" id="typing-badge">English</div>
+                <h1 class="typing-word" id="typing-word">Word</h1>
+                <p class="typing-sentence" id="typing-sentence">Example sentence...</p>
+            </div>
+        </div>
+
+        <div class="typing-input-area">
+            <input type="text" class="typing-input" id="typing-input" placeholder="Çeviriyi yaz..." autocomplete="off">
+            <button class="typing-submit-btn" id="typing-submit">Kontrol Et</button>
+        </div>
+
+        <div class="typing-feedback hidden" id="typing-feedback">
+            <span class="feedback-icon" id="feedback-icon">✓</span>
+            <span class="feedback-text" id="feedback-text">Doğru!</span>
+        </div>
+
+        <div class="typing-progress">
+            <span id="typing-progress-text">0 / 0</span>
+        </div>
+    </div>
+
+    <!-- Sentence Game Screen -->
+    <div class="sentence-game-screen hidden" id="sentence-game-screen">
+        <header class="game-header">
+            <div class="logo" id="sentence-home-btn" style="cursor: pointer;">
+                <span class="logo-icon">⚡</span>
+                <span class="logo-text">BlitzFlash</span>
+            </div>
+            <div class="game-stats">
+                <div class="stat-item stat-correct">
+                    <span class="stat-number" id="sentence-correct-count">0</span>
+                    <span class="stat-label">✓ Doğru</span>
+                </div>
+                <div class="stat-item stat-wrong">
+                    <span class="stat-number" id="sentence-wrong-count">0</span>
+                    <span class="stat-label">✗ Yanlış</span>
+                </div>
+            </div>
+        </header>
+        <button class="back-btn" id="sentence-back-btn">← Geri</button>
+
+        <div class="sentence-card-container">
+            <div class="sentence-card">
+                <p class="sentence-text" id="sentence-text">Cümle yükleniyor...</p>
+            </div>
+        </div>
+
+        <div class="sentence-options" id="sentence-options">
+            <button class="option-btn" data-index="0">Seçenek 1</button>
+            <button class="option-btn" data-index="1">Seçenek 2</button>
+            <button class="option-btn" data-index="2">Seçenek 3</button>
+            <button class="option-btn" data-index="3">Seçenek 4</button>
+        </div>
+
+        <div class="sentence-progress">
+            <span id="sentence-progress-text">0 / 0</span>
         </div>
     </div>
 
