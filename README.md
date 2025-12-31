@@ -1,37 +1,91 @@
-# ⚡ BlitzFlash
+# ⚡ BlitzFlash - İngilizce Kelime Öğrenme Uygulaması
 
-BlitzFlash, İngilizce kelime dağarcığını en verimli şekilde geliştirmek için tasarlanmış, bilimsel temelli ve oyunlaştırılmış bir flashcard (kelime kartı) uygulamasıdır.
+BlitzFlash, İngilizce kelime öğrenmeyi eğlenceli ve etkili hale getiren modern bir flashcard uygulamasıdır. BBC 800 Essential Words listesi temel alınarak hazırlanmıştır.
 
-## 🚀 Canlı Demo
-Uygulamayı tarayıcınızda hemen deneyin: [BlitzFlash'ı Başlat](https://blitzflash.yildirimyigit.com/)
-
-## 🎯 Projenin Amacı ve Bilimsel Temeli
-Bu proje, rastgele kelimeler yerine **Stuart Webb (University of Western Ontario)** tarafından yürütülen ve [BBC News](https://www.bbc.com/news/world-44569277) üzerinde paylaşılan araştırmayı temel alır. 
-
-* **800 Kelime Kuralı:** Araştırmalar, bir dilde en sık kullanılan 800-1000 kelimeyi öğrenmenin, günlük konuşmaların **%75'ini** anlamak için yeterli olduğunu göstermektedir.
-* **Verimlilik:** BlitzFlash, kullanıcının en az çabayla en yüksek günlük konuşma hakimiyetine ulaşmasını hedefler.
+![BlitzFlash Screenshot](https://img.shields.io/badge/Version-1.0-blue) ![License](https://img.shields.io/badge/License-MIT-green)
 
 ## 🎮 Oyun Modları
 
-Uygulama, öğrenme sürecini farklı ihtiyaçlara göre ikiye ayırır:
+### 📚 Serbest Mod
+- Süresiz çalışma imkanı
+- Kartları çevirerek kelimeleri öğrenin
+- Sağa kaydır = Bildim, Sola kaydır = Bilemedim
+- Kendi hızınızda ilerleme
 
-1.  **🌿 Serbest Mod (Free Study):**
-    * Zaman sınırı yok.
-    * Kelimeleri kendi hızınızda inceleyin.
-    * Kartın üzerine tıklayarak Türkçe/İngilizce karşılıkları arasında geçiş yapın.
+### ⏱️ Süreli Mod
+- Zamana karşı yarış (10sn, 30sn, 60sn, 2dk)
+- Puan sistemi ile rekabet
+- Hızlı düşünme yeteneğinizi test edin
 
-2.  **⏱️ Süreli Yarışma (Timed Challenge):**
-    * Zamanla yarışın!
-    * Belirli bir süre içinde ne kadar çok kelime bilirseniz o kadar yüksek puan kazanırsınız.
-    * Hızlı düşünme ve anında hatırlama yeteneğinizi geliştirin.
+### ⌨️ Yazarak Tahmin
+- İngilizce veya Türkçe kelime gösterilir
+- Çevirisini yazarak doğru cevabı bulun
+- Örnek cümleler ile bağlamı anlayın
+- Anlık doğru/yanlış geri bildirimi
 
-## 🛠️ Kullanılan Teknolojiler
-Bu proje modern web teknolojileri ve hafif bir yapı ile inşa edilmiştir:
-- **Framework:** [Antigravity](https://github.com/...) (Hızlı ve performanslı logic yönetimi)
-- **Frontend:** HTML5, CSS3 ve JavaScript (ES6+)
-- **Veri Yapısı:** 800 kelimelik optimize edilmiş JSON veri seti.
+### 📝 Cümle Tamamla
+- Boşluklu cümle ve 4 seçenek
+- Doğru kelimeyi seçerek cümleyi tamamlayın
+- Görsel animasyonlarla geri bildirim
 
-## Ekran Görüntüleri
-![BlitzFlash Ekran Görüntüsü](anasayfa.jpg)
-![BlitzFlash Ekran Görüntüsü](serbestmod.jpg)
-![BlitzFlash Ekran Görüntüsü](surelimod.jpg)
+## 🚀 Kurulum
+
+1. Repository'yi klonlayın:
+```bash
+git clone https://github.com/kullaniciadi/blitzflash.git
+```
+
+2. `index.html` dosyasını tarayıcınızda açın veya bir web sunucusu kullanın.
+
+## 📁 Dosya Yapısı
+
+```
+blitzflash/
+├── index.html          # Ana HTML dosyası
+├── style.css           # Stiller ve animasyonlar
+├── app.js              # Uygulama mantığı
+├── words.js            # Ana kelime veritabanı
+├── words_part1-7.js    # Ek kelime listeleri
+└── README.md           # Dokümantasyon
+```
+
+## 🎨 Özellikler
+
+- ✅ **Modern Tasarım** - Koyu tema ve gradient efektleri
+- ✅ **Duyarlı (Responsive)** - Mobil ve masaüstü uyumlu
+- ✅ **Touch Desteği** - Mobil cihazlarda kaydırma desteği
+- ✅ **Klavye Kısayolları** - Arrow tuşları ve Enter ile kontrol
+- ✅ **Puan Sistemi** - İlerlemenizi takip edin
+- ✅ **800+ Kelime** - BBC Essential Words listesi
+- ✅ **Örnek Cümleler** - Her kelime için İngilizce ve Türkçe cümle
+
+## ⌨️ Klavye Kısayolları
+
+| Tuş | İşlev |
+|-----|-------|
+| `→` Sağ Ok | Bildim |
+| `←` Sol Ok | Bilemedim |
+| `Space` / `Enter` | Kartı Çevir |
+
+## 🛠️ Teknolojiler
+
+- HTML5
+- CSS3 (Animations, Flexbox, Grid)
+- Vanilla JavaScript (ES6+)
+- Google Fonts (Inter)
+
+## 📝 Lisans
+
+Bu proje MIT lisansı altında lisanslanmıştır.
+
+## 🤝 Katkıda Bulunma
+
+1. Bu repository'yi fork edin
+2. Feature branch'i oluşturun (`git checkout -b feature/yeni-ozellik`)
+3. Değişikliklerinizi commit edin (`git commit -m 'Yeni özellik eklendi'`)
+4. Branch'i push edin (`git push origin feature/yeni-ozellik`)
+5. Pull Request açın
+
+---
+
+⚡ **Hızlı öğren, hızlı ilerle!**
