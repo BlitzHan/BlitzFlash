@@ -479,6 +479,7 @@ const sentenceGameScreen = document.getElementById('sentence-game-screen');
 const sentenceModeBtn = document.getElementById('sentence-mode-btn');
 const sentenceHomeBtn = document.getElementById('sentence-home-btn');
 const sentenceText = document.getElementById('sentence-text');
+const sentenceTranslation = document.getElementById('sentence-translation');
 const sentenceOptions = document.getElementById('sentence-options');
 const sentenceCorrectCountEl = document.getElementById('sentence-correct-count');
 const sentenceWrongCountEl = document.getElementById('sentence-wrong-count');
@@ -526,47 +527,54 @@ function displaySentenceQuestion() {
     sentenceText.innerHTML = blankSentence;
 
     // Generate options (1 correct + 3 random wrong)
-    const options = generateSentenceOptions(word);
-    sentenceCorrectOptionIndex = options.correctIndex;
+    const optionData = generateSentenceOptions(word);
+    sentenceCorrectOptionIndex = optionData.correctIndex;
 
     const optionBtns = sentenceOptions.querySelectorAll('.option-btn');
     optionBtns.forEach((btn, i) => {
-        btn.textContent = options.words[i];
+        const opt = optionData.options[i];
+        btn.innerHTML = `<span class="option-english">${opt.english}</span><span class="option-turkish hidden">${opt.turkish}</span>`;
         btn.classList.remove('correct', 'wrong');
         btn.disabled = false;
     });
+
+    // Hide translation until answer is given
+    sentenceTranslation.classList.add('hidden');
 
     sentenceProgressText.textContent = `${sentenceCurrentIndex + 1} / ${sentenceShuffledWords.length}`;
 }
 
 function generateSentenceOptions(correctWord) {
     // Get 3 random wrong options from vocabulary
-    const wrongWords = [];
+    const wrongWordObjects = [];
     const allWords = getAllWords();
 
-    while (wrongWords.length < 3) {
-        const randomIndex = Math.floor(Math.random() * allWords.length);
-        const randomWord = allWords[randomIndex].english;
+    // Find the correct word object
+    const correctWordObj = allWords.find(w => w.english === correctWord);
 
-        if (randomWord !== correctWord && !wrongWords.includes(randomWord)) {
-            wrongWords.push(randomWord);
+    while (wrongWordObjects.length < 3) {
+        const randomIndex = Math.floor(Math.random() * allWords.length);
+        const randomWordObj = allWords[randomIndex];
+
+        if (randomWordObj.english !== correctWord && !wrongWordObjects.some(w => w.english === randomWordObj.english)) {
+            wrongWordObjects.push(randomWordObj);
         }
     }
 
     // Combine and shuffle
-    const allOptions = [correctWord, ...wrongWords];
+    const allOptionObjects = [correctWordObj, ...wrongWordObjects];
 
     // Shuffle options
-    for (let i = allOptions.length - 1; i > 0; i--) {
+    for (let i = allOptionObjects.length - 1; i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [allOptions[i], allOptions[j]] = [allOptions[j], allOptions[i]];
+        [allOptionObjects[i], allOptionObjects[j]] = [allOptionObjects[j], allOptionObjects[i]];
     }
 
     // Find correct index after shuffle
-    const correctIndex = allOptions.indexOf(correctWord);
+    const correctIndex = allOptionObjects.findIndex(w => w.english === correctWord);
 
     return {
-        words: allOptions,
+        options: allOptionObjects,
         correctIndex: correctIndex
     };
 }
@@ -577,8 +585,12 @@ function checkSentenceAnswer(selectedIndex) {
 
     const optionBtns = sentenceOptions.querySelectorAll('.option-btn');
 
-    // Disable all buttons
-    optionBtns.forEach(btn => btn.disabled = true);
+    // Disable all buttons and show Turkish translations
+    optionBtns.forEach(btn => {
+        btn.disabled = true;
+        const turkishSpan = btn.querySelector('.option-turkish');
+        if (turkishSpan) turkishSpan.classList.remove('hidden');
+    });
 
     if (selectedIndex === sentenceCorrectOptionIndex) {
         // Correct answer
@@ -593,10 +605,14 @@ function checkSentenceAnswer(selectedIndex) {
             blank.classList.add('filled');
         }
 
+        // Show Turkish translation with TR flag on left
+        sentenceTranslation.innerHTML = `<span class="tr-flag">🇹🇷</span>${sentenceCurrentWord.turkishSentence}`;
+        sentenceTranslation.classList.remove('hidden');
+
         setTimeout(() => {
             sentenceCurrentIndex++;
             displaySentenceQuestion();
-        }, 1000);
+        }, 1500);
     } else {
         // Wrong answer
         optionBtns[selectedIndex].classList.add('wrong');
@@ -611,10 +627,14 @@ function checkSentenceAnswer(selectedIndex) {
             blank.classList.add('filled');
         }
 
+        // Show Turkish translation with TR flag on left
+        sentenceTranslation.innerHTML = `<span class="tr-flag">🇹🇷</span>${sentenceCurrentWord.turkishSentence}`;
+        sentenceTranslation.classList.remove('hidden');
+
         setTimeout(() => {
             sentenceCurrentIndex++;
             displaySentenceQuestion();
-        }, 2000);
+        }, 2500);
     }
 }
 
