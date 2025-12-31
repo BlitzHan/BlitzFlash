@@ -4,6 +4,12 @@ BlitzFlash, İngilizce kelime öğrenmeyi eğlenceli ve etkili hale getiren mode
 
 ![BlitzFlash Screenshot](https://img.shields.io/badge/Version-1.0-blue) ![License](https://img.shields.io/badge/License-MIT-green)
 
+## � Canlı Demo
+
+**[👉 BlitzFlash'ı Hemen Dene!](https://blitzflash.yildirimyigit.com/)**
+
+Uygulamayı tarayıcınızda hemen deneyebilirsiniz - kurulum gerekmez!
+
 ## 🎮 Oyun Modları
 
 ### 📚 Serbest Mod
