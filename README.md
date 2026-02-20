@@ -33,12 +33,18 @@ Boşluklu İngilizce cümlelerde doğru kelimeyi 4 seçenek arasından bul.
 
 ## 📊 Kelime Havuzu
 
-Toplam **517 kelime** — temel İngilizce kelimeler, örnek cümleler ve Türkçe karşılıklarıyla birlikte.
+Toplam **790 kelime** — BBC 800 Essential Word List temel alınarak hazırlanmış, örnek cümleler ve Türkçe karşılıklarıyla birlikte.
 
 | Dosya | İçerik |
 |-------|--------|
-| `words.js` | Ana kelime listesi |
-| `words_part1.js` – `words_part7.js` | Ek kelime paketleri |
+| `words.js` | 176 İşlevsel kelime (the, which, and, because, vb.) |
+| `words_part1.js` | Sub-list 1-2 (know, go, again, kind, vb.) |
+| `words_part2.js` | Sub-list 3-4 (problem, love, company, care, vb.) |
+| `words_part3.js` | Sub-list 5-6 (fine, food, thinking, stay, vb.) |
+| `words_part4.js` | Sub-list 7-8 (rest, situation, thanks, instead, vb.) |
+| `words_part5.js` | Sub-list 9-10 (finally, letter, president, standard, vb.) |
+| `words_part6.js` | Sub-list 11-12 (approach, pressure, kill, design, vb.) |
+| `words_part7.js` | Sub-list 13 (television, trust, original, vb.) |
 
 Her kelime objesi şu bilgileri içerir:
 ```javascript
@@ -55,7 +61,7 @@ Her kelime objesi şu bilgileri içerir:
 - **HTML5** — Sayfa yapısı
 - **CSS3** — Dark tema, glassmorphism, animasyonlar
 - **Vanilla JavaScript** — Oyun mantığı, localStorage
-- **Google Fonts** — Inter font ailesi
+- **Google Fonts** — Outfit & DM Sans font aileleri
 
 ## 🎨 Tasarım Özellikleri
 
