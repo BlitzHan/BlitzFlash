@@ -681,8 +681,9 @@ sentenceHomeBtn.addEventListener('click', exitSentenceMode);
 sentenceBackBtn.addEventListener('click', exitSentenceMode);
 
 sentenceOptions.addEventListener('click', (e) => {
-    if (e.target.classList.contains('option-btn')) {
-        const index = parseInt(e.target.dataset.index);
+    const btn = e.target.closest('.option-btn');
+    if (btn) {
+        const index = parseInt(btn.dataset.index);
         checkSentenceAnswer(index);
     }
 });
