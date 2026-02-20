@@ -17,27 +17,13 @@ const totalCount = document.getElementById('total-count');
 const modeScreen = document.getElementById('mode-screen');
 const gameArea = document.getElementById('game-area');
 const freeModeBtn = document.getElementById('free-mode-btn');
-const timedModeBtn = document.getElementById('timed-mode-btn');
-const timeSelection = document.getElementById('time-selection');
-const countdownOverlay = document.getElementById('countdown-overlay');
-const countdownNumber = document.getElementById('countdown-number');
-const timerDisplay = document.getElementById('timer-display');
-const timerValue = document.getElementById('timer-value');
-const resultsScreen = document.getElementById('results-screen');
-const resultsScore = document.getElementById('results-score');
-const resultCorrect = document.getElementById('result-correct');
-const resultWrong = document.getElementById('result-wrong');
-const playAgainBtn = document.getElementById('play-again-btn');
 
 // State
 let currentIndex = 0;
 let correct = 0;
 let wrong = 0;
 let shuffledVocabulary = [];
-let gameMode = 'free'; // 'free' or 'timed'
-let timeLimit = 0;
-let timeRemaining = 0;
-let timerInterval = null;
+let gameMode = 'free';
 let isGameActive = false;
 
 // Combine all vocabulary
@@ -67,84 +53,7 @@ function startFreeMode() {
     gameMode = 'free';
     modeScreen.classList.add('hidden');
     gameArea.classList.remove('hidden');
-    timerDisplay.classList.add('hidden');
     startGame();
-}
-
-// Show Time Selection
-function showTimeSelection() {
-    timeSelection.classList.remove('hidden');
-}
-
-// Start Timed Mode
-function startTimedMode(seconds) {
-    gameMode = 'timed';
-    timeLimit = seconds;
-    timeRemaining = seconds;
-    modeScreen.classList.add('hidden');
-
-    // Show countdown
-    countdownOverlay.classList.remove('hidden');
-    startCountdown();
-}
-
-// Countdown 3-2-1
-function startCountdown() {
-    let count = 3;
-    countdownNumber.textContent = count;
-
-    const countInterval = setInterval(() => {
-        count--;
-        if (count > 0) {
-            countdownNumber.textContent = count;
-            // Re-trigger animation
-            countdownNumber.style.animation = 'none';
-            setTimeout(() => countdownNumber.style.animation = 'countdownPulse 1s ease-in-out', 10);
-        } else {
-            clearInterval(countInterval);
-            countdownOverlay.classList.add('hidden');
-            gameArea.classList.remove('hidden');
-            timerDisplay.classList.remove('hidden');
-            startGame();
-            startTimer();
-        }
-    }, 1000);
-}
-
-// Start Timer
-function startTimer() {
-    updateTimerDisplay();
-    timerInterval = setInterval(() => {
-        timeRemaining--;
-        updateTimerDisplay();
-
-        if (timeRemaining <= 0) {
-            endTimedGame();
-        }
-    }, 1000);
-}
-
-// Update Timer Display
-function updateTimerDisplay() {
-    const mins = Math.floor(timeRemaining / 60);
-    const secs = timeRemaining % 60;
-    timerValue.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
-}
-
-// End Timed Game
-function endTimedGame() {
-    clearInterval(timerInterval);
-    isGameActive = false;
-
-    // Calculate score: doğru * 10 - yanlış * 5
-    const score = Math.max(0, (correct * 10) - (wrong * 5));
-
-    gameArea.classList.add('hidden');
-    resultsScreen.classList.remove('hidden');
-
-    resultsScore.textContent = score;
-    resultCorrect.textContent = correct;
-    resultWrong.textContent = wrong;
 }
 
 // Start Game
@@ -217,7 +126,7 @@ function swipeCard(direction) {
             flashcard.classList.add('entering');
             displayCurrentWord();
             setTimeout(() => flashcard.classList.remove('entering'), 150);
-        } else if (gameMode === 'free') {
+        } else {
             showFreeCompletion();
         }
     }, 200);
@@ -240,18 +149,8 @@ function toggleFlip() {
     flashcard.classList.toggle('flipped');
 }
 
-// Play Again
-function playAgain() {
-    resultsScreen.classList.add('hidden');
-    gameArea.classList.add('hidden');
-    timeSelection.classList.add('hidden');
-    modeScreen.classList.remove('hidden');
-    clearInterval(timerInterval);
-}
-
 // Event Listeners
 freeModeBtn.addEventListener('click', startFreeMode);
-timedModeBtn.addEventListener('click', showTimeSelection);
 
 // Back button
 const backBtn = document.getElementById('back-btn');
@@ -259,24 +158,14 @@ backBtn.addEventListener('click', goBack);
 
 function goBack() {
     isGameActive = false;
-    clearInterval(timerInterval);
     gameArea.classList.add('hidden');
-    timerDisplay.classList.add('hidden');
-    timeSelection.classList.add('hidden');
     modeScreen.classList.remove('hidden');
 }
-
-document.querySelectorAll('.time-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-        startTimedMode(parseInt(btn.dataset.time));
-    });
-});
 
 flashcard.addEventListener('click', toggleFlip);
 correctBtn.addEventListener('click', markCorrect);
 wrongBtn.addEventListener('click', markWrong);
 flipBtn.addEventListener('click', toggleFlip);
-playAgainBtn.addEventListener('click', playAgain);
 
 // Keyboard navigation
 document.addEventListener('keydown', (e) => {
@@ -328,6 +217,15 @@ const feedbackText = document.getElementById('feedback-text');
 const typingCorrectCount = document.getElementById('typing-correct-count');
 const typingWrongCount = document.getElementById('typing-wrong-count');
 const typingProgressText = document.getElementById('typing-progress-text');
+const typingTimerValue = document.getElementById('typing-timer-value');
+const typingTimerDisplay = document.getElementById('typing-timer-display');
+
+const TYPING_GAME_DURATION_SECONDS = 60;
+const LEADERBOARD_STORAGE_KEY = 'blitzflash_leaderboard';
+const LEADERBOARD_MAX_ENTRIES = 10;
+const typingLeaderboard = document.getElementById('typing-leaderboard');
+const leaderboardList = document.getElementById('leaderboard-list');
+const typingPlayAgainBtn = document.getElementById('typing-play-again-btn');
 
 let typingCurrentIndex = 0;
 let typingCorrect = 0;
@@ -335,6 +233,10 @@ let typingWrong = 0;
 let typingShuffledWords = [];
 let typingCurrentWord = null;
 let typingIsEnglish = true; // true = showing English, need Turkish answer
+let typingTimerInterval = null;
+let typingTimeRemaining = TYPING_GAME_DURATION_SECONDS;
+let typingTimerStarted = false;
+let typingGameActive = false;
 
 function startTypingMode() {
     modeScreen.classList.add('hidden');
@@ -346,8 +248,49 @@ function startTypingMode() {
     typingWrong = 0;
     typingCorrectCount.textContent = '0';
     typingWrongCount.textContent = '0';
+    typingTimeRemaining = TYPING_GAME_DURATION_SECONDS;
+    typingTimerValue.textContent = typingTimeRemaining;
+    typingTimerStarted = false;
+    typingGameActive = true;
+    clearInterval(typingTimerInterval);
+    typingLeaderboard.classList.add('hidden');
 
     displayTypingWord();
+}
+
+function startTypingTimer() {
+    typingTimerStarted = true;
+    typingTimerInterval = setInterval(() => {
+        typingTimeRemaining--;
+        typingTimerValue.textContent = typingTimeRemaining;
+
+        if (typingTimeRemaining <= 10) {
+            typingTimerDisplay.classList.add('timer-warning');
+        }
+
+        if (typingTimeRemaining <= 0) {
+            endTypingGame();
+        }
+    }, 1000);
+}
+
+function endTypingGame() {
+    clearInterval(typingTimerInterval);
+    typingGameActive = false;
+    typingTimerDisplay.classList.remove('timer-warning');
+
+    typingWord.textContent = '⏱️ Süre Doldu!';
+    typingBadge.textContent = 'Bitti';
+    typingSentence.textContent = `Skorun: ${typingCorrect} doğru cevap!`;
+    typingInput.style.display = 'none';
+    typingSubmit.style.display = 'none';
+    typingFeedback.classList.remove('hidden', 'wrong');
+    typingFeedback.classList.add('correct');
+    feedbackIcon.textContent = '🏆';
+    feedbackText.textContent = `${typingCorrect} doğru, ${typingWrong} yanlış`;
+
+    saveLeaderboardScore(typingCorrect, typingWrong);
+    showLeaderboard();
 }
 
 function displayTypingWord() {
@@ -392,8 +335,14 @@ function normalizeText(text) {
 }
 
 function checkTypingAnswer() {
+    if (!typingGameActive) return;
     const userAnswer = typingInput.value.trim();
     if (!userAnswer) return;
+
+    // Start timer on first answer
+    if (!typingTimerStarted) {
+        startTypingTimer();
+    }
 
     let correctAnswer;
     if (typingIsEnglish) {
@@ -443,22 +392,86 @@ function showTypingFeedback(isCorrect, correctAnswer) {
 }
 
 function showTypingCompletion() {
+    clearInterval(typingTimerInterval);
+    typingGameActive = false;
+    typingTimerDisplay.classList.remove('timer-warning');
+
     typingWord.textContent = '🎉 Tebrikler!';
     typingBadge.textContent = 'Bitti';
-    typingSentence.textContent = `${typingCorrect} doğru, ${typingWrong} yanlış`;
+    typingSentence.textContent = `Skorun: ${typingCorrect} doğru cevap!`;
     typingInput.style.display = 'none';
     typingSubmit.style.display = 'none';
     typingFeedback.classList.remove('hidden', 'wrong');
     typingFeedback.classList.add('correct');
     feedbackIcon.textContent = '⭐';
-    feedbackText.textContent = `Puan: ${typingCorrect * 10}`;
+    feedbackText.textContent = `${typingCorrect} doğru, ${typingWrong} yanlış`;
+
+    saveLeaderboardScore(typingCorrect, typingWrong);
+    showLeaderboard();
 }
 
 function exitTypingMode() {
+    clearInterval(typingTimerInterval);
+    typingGameActive = false;
+    typingTimerDisplay.classList.remove('timer-warning');
     typingGameScreen.classList.add('hidden');
     modeScreen.classList.remove('hidden');
     typingInput.style.display = '';
     typingSubmit.style.display = '';
+    typingLeaderboard.classList.add('hidden');
+}
+
+// ===== LEADERBOARD =====
+function getLeaderboardScores() {
+    const data = localStorage.getItem(LEADERBOARD_STORAGE_KEY);
+    return data ? JSON.parse(data) : [];
+}
+
+function saveLeaderboardScore(correctCount, wrongCount) {
+    const scores = getLeaderboardScores();
+    scores.push({
+        score: correctCount,
+        wrong: wrongCount,
+        date: new Date().toLocaleDateString('tr-TR', { day: '2-digit', month: '2-digit', year: 'numeric', hour: '2-digit', minute: '2-digit' })
+    });
+    // Sort by score descending
+    scores.sort((a, b) => b.score - a.score);
+    // Keep only top entries
+    const trimmed = scores.slice(0, LEADERBOARD_MAX_ENTRIES);
+    localStorage.setItem(LEADERBOARD_STORAGE_KEY, JSON.stringify(trimmed));
+}
+
+function showLeaderboard() {
+    const scores = getLeaderboardScores();
+    const RANK_MEDALS = ['🥇', '🥈', '🥉'];
+    leaderboardList.innerHTML = '';
+
+    if (scores.length === 0) {
+        leaderboardList.innerHTML = '<p class="leaderboard-empty">Henüz skor yok</p>';
+    } else {
+        scores.forEach((entry, index) => {
+            const row = document.createElement('div');
+            row.className = 'leaderboard-row';
+            if (index < 3) row.classList.add('leaderboard-top');
+
+            const rankIcon = index < RANK_MEDALS.length ? RANK_MEDALS[index] : `${index + 1}.`;
+
+            row.innerHTML = `
+                <span class="lb-rank">${rankIcon}</span>
+                <span class="lb-score">${entry.score} doğru</span>
+                <span class="lb-wrong">${entry.wrong} yanlış</span>
+                <span class="lb-date">${entry.date}</span>
+            `;
+            leaderboardList.appendChild(row);
+        });
+    }
+
+    typingLeaderboard.classList.remove('hidden');
+}
+
+function playAgainTyping() {
+    typingLeaderboard.classList.add('hidden');
+    startTypingMode();
 }
 
 // Typing mode event listeners
@@ -466,6 +479,7 @@ const typingBackBtn = document.getElementById('typing-back-btn');
 typingModeBtn.addEventListener('click', startTypingMode);
 typingHomeBtn.addEventListener('click', exitTypingMode);
 typingBackBtn.addEventListener('click', exitTypingMode);
+typingPlayAgainBtn.addEventListener('click', playAgainTyping);
 typingSubmit.addEventListener('click', checkTypingAnswer);
 typingInput.addEventListener('keydown', (e) => {
     if (e.key === 'Enter') {

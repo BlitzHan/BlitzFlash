@@ -1,85 +1,94 @@
-# ⚡ BlitzFlash - İngilizce Kelime Öğrenme Uygulaması
+# ⚡ BlitzFlash - İngilizce Kelime Öğren
 
-BlitzFlash, İngilizce kelime öğrenmeyi eğlenceli ve etkili hale getiren modern bir flashcard uygulamasıdır. BBC 800 Essential Words listesi temel alınarak hazırlanmıştır.
+Hızlı ve eğlenceli bir şekilde İngilizce kelime öğrenmeni sağlayan interaktif flashcard uygulaması.
 
-![BlitzFlash](https://img.shields.io/badge/Version-1.0-blue)
-
-## � Canlı Demo
-
-**[👉 BlitzFlash'ı Hemen Dene!](https://blitzflash.yildirimyigit.com/)**
-
-Uygulamayı tarayıcınızda hemen deneyebilirsiniz - kurulum gerekmez!
+![BlitzFlash](anasayfa.jpg)
 
 ## 🎮 Oyun Modları
 
 ### 📚 Serbest Mod
-- Süresiz çalışma imkanı
-- Kartları çevirerek kelimeleri öğrenin
-- Sağa kaydır = Bildim, Sola kaydır = Bilemedim
-- Kendi hızınızda ilerleme
+Süre baskısı olmadan kendi hızında çalış. Flashcard'ları çevirerek kelimelerin İngilizce ve Türkçe karşılıklarını öğren.
 
-### ⏱️ Süreli Mod
-- Zamana karşı yarış (10sn, 30sn, 60sn, 2dk)
-- Puan sistemi ile rekabet
-- Hızlı düşünme yeteneğinizi test edin
+- **Kart çevirme**: Tıkla veya Space/Enter tuşuna bas
+- **Bildim**: Sağa kaydır veya → ok tuşu
+- **Bilemedim**: Sola kaydır veya ← ok tuşu
+- Tüm kelimeler bittiğinde doğruluk yüzdesi gösterilir
 
-### ⌨️ Yazarak Tahmin
-- İngilizce veya Türkçe kelime gösterilir
-- Çevirisini yazarak doğru cevabı bulun
-- Örnek cümleler ile bağlamı anlayın
-- Anlık doğru/yanlış geri bildirimi
+### ⌨️ Yazarak Tahmin (60 Saniye Modu)
+60 saniyede kaç kelime bilirsin? Gösterilen kelimeye çevirisini yazarak cevap ver.
+
+- Rastgele İngilizce veya Türkçe kelime gösterilir
+- Çevirisini yazıp **Enter** veya **Kontrol Et** butonuna bas
+- İlk cevabınla birlikte **60 saniyelik geri sayım** başlar
+- Birden fazla anlamı olan kelimeler için herhangi birini yazmak yeterli
+- Süre dolduğunda doğru sayın **skor** olarak kaydedilir
+- **🏆 Skor Tablosu**: En iyi 10 skorun localStorage'da saklanır
 
 ### 📝 Cümle Tamamla
-- Boşluklu cümle ve 4 seçenek
-- Doğru kelimeyi seçerek cümleyi tamamlayın
-- Görsel animasyonlarla geri bildirim
+Boşluklu İngilizce cümlelerde doğru kelimeyi 4 seçenek arasından bul.
+
+- Cümledeki boş kelimeyi tahmin et
+- Doğru/yanlış cevaptan sonra Türkçe çeviri gösterilir
+- Seçeneklerin altında Türkçe anlamları da listelenir
+
+## 📊 Kelime Havuzu
+
+Toplam **517 kelime** — temel İngilizce kelimeler, örnek cümleler ve Türkçe karşılıklarıyla birlikte.
+
+| Dosya | İçerik |
+|-------|--------|
+| `words.js` | Ana kelime listesi |
+| `words_part1.js` – `words_part7.js` | Ek kelime paketleri |
+
+Her kelime objesi şu bilgileri içerir:
+```javascript
+{
+    english: "Word",
+    turkish: "Kelime",
+    englishSentence: "Example sentence with the word.",
+    turkishSentence: "Kelimeyi içeren örnek cümle."
+}
+```
+
+## 🛠️ Teknolojiler
+
+- **HTML5** — Sayfa yapısı
+- **CSS3** — Dark tema, glassmorphism, animasyonlar
+- **Vanilla JavaScript** — Oyun mantığı, localStorage
+- **Google Fonts** — Inter font ailesi
+
+## 🎨 Tasarım Özellikleri
+
+- 🌙 Premium koyu tema
+- 🔮 Glassmorphism efektleri ve gradient orb animasyonları
+- ✨ Kart çevirme, kaydırma ve geri bildirim animasyonları
+- 📱 Mobil uyumlu (responsive) tasarım
+- 👆 Dokunmatik kaydırma desteği
 
 ## 🚀 Kurulum
 
-1. Repository'yi klonlayın:
-```bash
-git clone https://github.com/kullaniciadi/blitzflash.git
-```
+Herhangi bir bağımlılık veya build adımı yok. Doğrudan çalışır:
 
-2. `index.html` dosyasını tarayıcınızda açın veya bir web sunucusu kullanın.
+```bash
+# Projeyi klonla
+git clone <repo-url>
+
+# index.html dosyasını tarayıcıda aç
+start index.html
+```
 
 ## 📁 Dosya Yapısı
 
 ```
-blitzflash/
-├── index.html          # Ana HTML dosyası
-├── style.css           # Stiller ve animasyonlar
-├── app.js              # Uygulama mantığı
-├── words.js            # Ana kelime veritabanı
-├── words_part1-7.js    # Ek kelime listeleri
-└── README.md           # Dokümantasyon
+BlitzFlash/
+├── index.html          # Ana sayfa
+├── style.css           # Tüm stiller
+├── app.js              # Oyun mantığı
+├── words.js            # Ana kelime listesi
+├── words_part1-7.js    # Ek kelime paketleri
+└── README.md           # Bu dosya
 ```
 
-## 🎨 Özellikler
+## 📝 Lisans
 
-- ✅ **Modern Tasarım** - Koyu tema ve gradient efektleri
-- ✅ **Duyarlı (Responsive)** - Mobil ve masaüstü uyumlu
-- ✅ **Touch Desteği** - Mobil cihazlarda kaydırma desteği
-- ✅ **Klavye Kısayolları** - Arrow tuşları ve Enter ile kontrol
-- ✅ **Puan Sistemi** - İlerlemenizi takip edin
-- ✅ **800+ Kelime** - BBC Essential Words listesi
-- ✅ **Örnek Cümleler** - Her kelime için İngilizce ve Türkçe cümle
-
-## ⌨️ Klavye Kısayolları
-
-| Tuş | İşlev |
-|-----|-------|
-| `→` Sağ Ok | Bildim |
-| `←` Sol Ok | Bilemedim |
-| `Space` / `Enter` | Kartı Çevir |
-
-## 🛠️ Teknolojiler
-
-- HTML5
-- CSS3 (Animations, Flexbox, Grid)
-- Vanilla JavaScript (ES6+)
-- Google Fonts (Inter)
-
----
-
-⚡ **Hızlı öğren, hızlı ilerle!**
+Bu proje kişisel eğitim amaçlı geliştirilmiştir.

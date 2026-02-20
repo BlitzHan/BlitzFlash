@@ -53,16 +53,10 @@
                     <span class="mode-desc">Süresiz, kendi hızında çalış</span>
                 </button>
 
-                <button class="mode-btn" id="timed-mode-btn">
-                    <span class="mode-icon">⏱️</span>
-                    <span class="mode-name">Süreli Mod</span>
-                    <span class="mode-desc">Zamana karşı yarış!</span>
-                </button>
-
                 <button class="mode-btn" id="typing-mode-btn">
                     <span class="mode-icon">⌨️</span>
                     <span class="mode-name">Yazarak Tahmin</span>
-                    <span class="mode-desc">Çeviriyi yazarak öğren!</span>
+                    <span class="mode-desc">60 saniyede kaç bilirsin?</span>
                 </button>
 
                 <button class="mode-btn" id="sentence-mode-btn">
@@ -71,44 +65,10 @@
                     <span class="mode-desc">Doğru kelimeyi bul!</span>
                 </button>
             </div>
-
-            <!-- Time Selection (hidden by default) -->
-            <div class="time-selection hidden" id="time-selection">
-                <p class="time-title">Süre Seç:</p>
-                <div class="time-options">
-                    <button class="time-btn" data-time="10">10 sn</button>
-                    <button class="time-btn" data-time="30">30 sn</button>
-                    <button class="time-btn" data-time="60">60 sn</button>
-                    <button class="time-btn" data-time="120">2 dk</button>
-                </div>
-            </div>
         </div>
     </div>
 
-    <!-- Countdown Overlay -->
-    <div class="countdown-overlay hidden" id="countdown-overlay">
-        <div class="countdown-number" id="countdown-number">3</div>
-    </div>
 
-    <!-- Game Results Screen -->
-    <div class="results-screen hidden" id="results-screen">
-        <div class="results-container">
-            <h1 class="results-title">⏱️ Süre Doldu!</h1>
-            <div class="results-score" id="results-score">0</div>
-            <p class="results-label">PUAN</p>
-            <div class="results-stats">
-                <div class="result-stat correct">
-                    <span class="result-number" id="result-correct">0</span>
-                    <span class="result-label">Doğru</span>
-                </div>
-                <div class="result-stat wrong">
-                    <span class="result-number" id="result-wrong">0</span>
-                    <span class="result-label">Yanlış</span>
-                </div>
-            </div>
-            <button class="btn btn-flip" id="play-again-btn">Tekrar Oyna</button>
-        </div>
-    </div>
 
     <!-- Typing Game Screen -->
     <div class="typing-game-screen hidden" id="typing-game-screen">
@@ -125,6 +85,10 @@
                 <div class="stat-item stat-wrong">
                     <span class="stat-number" id="typing-wrong-count">0</span>
                     <span class="stat-label">✗ Yanlış</span>
+                </div>
+                <div class="stat-item typing-timer-display" id="typing-timer-display">
+                    <span class="stat-number" id="typing-timer-value">60</span>
+                    <span class="stat-label">⏱️ Süre</span>
                 </div>
             </div>
         </header>
@@ -150,6 +114,15 @@
 
         <div class="typing-progress">
             <span id="typing-progress-text">0 / 0</span>
+        </div>
+
+        <!-- Leaderboard -->
+        <div class="leaderboard hidden" id="typing-leaderboard">
+            <h2 class="leaderboard-title">🏆 Skor Tablosu</h2>
+            <div class="leaderboard-list" id="leaderboard-list">
+                <!-- Scores will be populated dynamically -->
+            </div>
+            <button class="leaderboard-play-btn" id="typing-play-again-btn">🔄 Tekrar Oyna</button>
         </div>
     </div>
 
