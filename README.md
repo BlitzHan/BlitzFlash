@@ -2,7 +2,7 @@
 
 Hızlı ve eğlenceli bir şekilde İngilizce kelime öğrenmeni sağlayan interaktif flashcard uygulaması.
 
-![BlitzFlash](anasayfa.jpg)
+![BlitzFlash Anasayfa](screenshots/anasayfa.png)
 
 ## 🎮 Oyun Modları
 
@@ -15,6 +15,8 @@ Süre baskısı olmadan kendi hızında çalış. Flashcard'ları çevirerek kel
 - Sürükleme sırasında kart hareket eder ve yön göstergeleri aktif olur
 - Tüm kelimeler bittiğinde doğruluk yüzdesi gösterilir
 
+![Serbest Mod](screenshots/serbest_mod.png)
+
 ### ⌨️ Yazarak Tahmin (60 Saniye Modu)
 60 saniyede kaç kelime bilirsin? Gösterilen kelimeye çevirisini yazarak cevap ver.
 
@@ -26,12 +28,16 @@ Süre baskısı olmadan kendi hızında çalış. Flashcard'ları çevirerek kel
 - Süre dolduğunda doğru sayın **skor** olarak kaydedilir
 - **🏆 Skor Tablosu**: En iyi 10 skorun localStorage'da saklanır
 
+![Yazarak Tahmin](screenshots/yazarak_tahmin.png)
+
 ### 📝 Cümle Tamamla
 Boşluklu İngilizce cümlelerde doğru kelimeyi 4 seçenek arasından bul.
 
 - Cümledeki boş kelimeyi tahmin et
 - Doğru/yanlış cevaptan sonra Türkçe çeviri gösterilir
 - Seçeneklerin altında Türkçe anlamları da listelenir
+
+![Cümle Tamamla](screenshots/cumle_tamamla.png)
 
 ## 📊 Kelime Havuzu
 
@@ -71,7 +77,7 @@ Her kelime objesi şu bilgileri içerir:
 - 🔮 Glassmorphism efektleri ve gradient orb animasyonları
 - ✨ Kart çevirme, kaydırma ve geri bildirim animasyonları
 - 📱 Mobil uyumlu (responsive) tasarım
-- 👆 Dokunmatik kaydırma desteği
+- 👆 Dokunmatik ve mouse sürükleme desteği
 
 ## 🚀 Kurulum
 
@@ -94,6 +100,7 @@ BlitzFlash/
 ├── app.js              # Oyun mantığı
 ├── words.js            # Ana kelime listesi
 ├── words_part1-7.js    # Ek kelime paketleri
+├── screenshots/        # Ekran görüntüleri
 └── README.md           # Bu dosya
 ```
 
