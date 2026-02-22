@@ -10,8 +10,9 @@ Hızlı ve eğlenceli bir şekilde İngilizce kelime öğrenmeni sağlayan inter
 Süre baskısı olmadan kendi hızında çalış. Flashcard'ları çevirerek kelimelerin İngilizce ve Türkçe karşılıklarını öğren.
 
 - **Kart çevirme**: Tıkla veya Space/Enter tuşuna bas
-- **Bildim**: Sağa kaydır veya → ok tuşu
-- **Bilemedim**: Sola kaydır veya ← ok tuşu
+- **Bildim**: Sağa kaydır (dokunmatik veya mouse ile sürükle) veya → ok tuşu
+- **Bilemedim**: Sola kaydır (dokunmatik veya mouse ile sürükle) veya ← ok tuşu
+- Sürükleme sırasında kart hareket eder ve yön göstergeleri aktif olur
 - Tüm kelimeler bittiğinde doğruluk yüzdesi gösterilir
 
 ### ⌨️ Yazarak Tahmin (60 Saniye Modu)
@@ -20,6 +21,7 @@ Süre baskısı olmadan kendi hızında çalış. Flashcard'ları çevirerek kel
 - Rastgele İngilizce veya Türkçe kelime gösterilir
 - Çevirisini yazıp **Enter** veya **Kontrol Et** butonuna bas
 - İlk cevabınla birlikte **60 saniyelik geri sayım** başlar
+- Cevap verdikten sonra kart üzerinde hem **İngilizce hem Türkçe** kelime ve cümle gösterilir
 - Birden fazla anlamı olan kelimeler için herhangi birini yazmak yeterli
 - Süre dolduğunda doğru sayın **skor** olarak kaydedilir
 - **🏆 Skor Tablosu**: En iyi 10 skorun localStorage'da saklanır

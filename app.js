@@ -162,7 +162,16 @@ function goBack() {
     modeScreen.classList.remove('hidden');
 }
 
-flashcard.addEventListener('click', toggleFlip);
+// Drag tracking variables (declared early for click handler access)
+let isDragging = false;
+let dragStartX = 0;
+let dragCurrentX = 0;
+
+flashcard.addEventListener('click', (e) => {
+    // Don't flip if we just finished dragging
+    if (Math.abs(dragCurrentX - dragStartX) > 5) return;
+    toggleFlip();
+});
 correctBtn.addEventListener('click', markCorrect);
 wrongBtn.addEventListener('click', markWrong);
 flipBtn.addEventListener('click', toggleFlip);
@@ -201,6 +210,56 @@ flashcard.addEventListener('touchend', (e) => {
         else markCorrect();
     }
 }, { passive: true });
+
+// Mouse drag swipe support (for desktop)
+const SWIPE_THRESHOLD = 80;
+
+flashcard.addEventListener('mousedown', (e) => {
+    if (!isGameActive) return;
+    isDragging = true;
+    dragStartX = e.clientX;
+    dragCurrentX = e.clientX;
+    flashcard.style.transition = 'none';
+    e.preventDefault();
+});
+
+document.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    dragCurrentX = e.clientX;
+    const diffX = dragCurrentX - dragStartX;
+    const rotation = diffX * 0.08;
+    const opacity = Math.max(1 - Math.abs(diffX) / 400, 0.5);
+    flashcard.style.transform = `translateX(${diffX}px) rotate(${rotation}deg)`;
+    flashcard.style.opacity = opacity;
+
+    // Show swipe indicators during drag
+    const indicators = document.querySelectorAll('.swipe-indicator');
+    if (diffX > SWIPE_THRESHOLD) {
+        indicators.forEach(ind => ind.style.opacity = ind.classList.contains('swipe-right') ? '1' : '0');
+    } else if (diffX < -SWIPE_THRESHOLD) {
+        indicators.forEach(ind => ind.style.opacity = ind.classList.contains('swipe-left') ? '1' : '0');
+    } else {
+        indicators.forEach(ind => ind.style.opacity = '0');
+    }
+});
+
+document.addEventListener('mouseup', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    const diffX = dragCurrentX - dragStartX;
+
+    // Reset swipe indicators
+    document.querySelectorAll('.swipe-indicator').forEach(ind => ind.style.opacity = '0');
+
+    flashcard.style.transition = '';
+    flashcard.style.transform = '';
+    flashcard.style.opacity = '';
+
+    if (Math.abs(diffX) > SWIPE_THRESHOLD) {
+        if (diffX > 0) markCorrect();
+        else markWrong();
+    }
+});
 
 // ===== TYPING GAME MODE =====
 const typingGameScreen = document.getElementById('typing-game-screen');
@@ -384,11 +443,20 @@ function showTypingFeedback(isCorrect, correctAnswer) {
         typingWrongCount.textContent = typingWrong;
     }
 
+    // Show both English and Turkish on the card
+    typingBadge.textContent = '🇬🇧 / 🇹🇷';
+    typingBadge.classList.remove('turkish');
+    typingWord.innerHTML = `${typingCurrentWord.english} <span style="color: var(--text-muted); font-size: 0.5em; vertical-align: middle;">→</span> ${typingCurrentWord.turkish}`;
+    typingSentence.innerHTML = `${typingCurrentWord.englishSentence}<br><span style="color: var(--secondary); font-style: normal;">🇹🇷 ${typingCurrentWord.turkishSentence}</span>`;
+
+    const FEEDBACK_DELAY_MS_CORRECT = 1500;
+    const FEEDBACK_DELAY_MS_WRONG = 3000;
+
     // Move to next word after delay
     setTimeout(() => {
         typingCurrentIndex++;
         displayTypingWord();
-    }, isCorrect ? 800 : 2000);
+    }, isCorrect ? FEEDBACK_DELAY_MS_CORRECT : FEEDBACK_DELAY_MS_WRONG);
 }
 
 function showTypingCompletion() {
