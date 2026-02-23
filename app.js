@@ -123,6 +123,16 @@ function swipeCard(direction) {
 
         if (currentIndex < shuffledVocabulary.length - 1) {
             currentIndex++;
+
+            // Snap card to front face instantly before showing new content
+            // to prevent the next card's back face from being briefly visible
+            const cardInner = document.getElementById('card-inner');
+            cardInner.style.transition = 'none';
+            flashcard.classList.remove('flipped');
+            // Force reflow so the instant snap takes effect
+            void cardInner.offsetHeight;
+            cardInner.style.transition = '';
+
             flashcard.classList.add('entering');
             displayCurrentWord();
             setTimeout(() => flashcard.classList.remove('entering'), 150);
