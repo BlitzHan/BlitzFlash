@@ -1470,3 +1470,442 @@ body {
         opacity: 1;
     }
 }
+
+/* ===== Grid Game Mode (Kelime Avı) ===== */
+.grid-game-screen {
+    position: fixed;
+    inset: 0;
+    z-index: 100;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: var(--background);
+    padding: 2rem;
+    padding-top: 110px;
+    overflow-y: auto;
+}
+
+.grid-game-screen .back-btn {
+    position: absolute;
+    top: 70px;
+    left: 1.5rem;
+}
+
+.grid-word-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.75rem;
+    width: 100%;
+    max-width: 560px;
+    padding-bottom: 2rem;
+}
+
+.grid-word-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 1.2rem 0.75rem;
+    min-height: 90px;
+    background: var(--surface);
+    border: 1px solid rgba(0, 240, 255, 0.08);
+    border-radius: var(--border-radius-sm);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    text-align: center;
+    gap: 0.35rem;
+    user-select: none;
+}
+
+.grid-word-card:hover:not(.solved):not(.failed) {
+    border-color: rgba(0, 240, 255, 0.3);
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(0, 240, 255, 0.12);
+    background: var(--surface-light);
+}
+
+.grid-word-card:active:not(.solved):not(.failed) {
+    transform: translateY(-1px);
+}
+
+.grid-word-card .grid-card-lang {
+    font-family: var(--font-display);
+    font-size: 0.55rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    padding: 0.2rem 0.5rem;
+    border-radius: 4px;
+    position: absolute;
+    top: 0.4rem;
+    right: 0.4rem;
+}
+
+.grid-card-lang.lang-en {
+    background: rgba(0, 240, 255, 0.15);
+    color: var(--primary-light);
+}
+
+.grid-card-lang.lang-tr {
+    background: rgba(255, 45, 124, 0.15);
+    color: var(--secondary);
+}
+
+.grid-word-card .grid-card-text {
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.3;
+    word-break: break-word;
+}
+
+.grid-word-card .grid-card-points {
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 600;
+    color: var(--text-muted);
+    opacity: 0;
+    transition: opacity 0.2s ease;
+}
+
+.grid-word-card:hover .grid-card-points {
+    opacity: 1;
+}
+
+/* Solved state */
+.grid-word-card.solved {
+    background: rgba(0, 230, 118, 0.08);
+    border-color: rgba(0, 230, 118, 0.3);
+    cursor: default;
+    animation: gridSolve 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.grid-word-card.solved .grid-card-text {
+    color: var(--success);
+}
+
+.grid-word-card.solved .grid-card-translation {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    color: var(--text-muted);
+    font-style: italic;
+    margin-top: 0.15rem;
+}
+
+.grid-word-card.solved .grid-card-points {
+    opacity: 1;
+    color: var(--success);
+}
+
+/* Failed state */
+.grid-word-card.failed {
+    background: rgba(255, 61, 90, 0.06);
+    border-color: rgba(255, 61, 90, 0.2);
+    cursor: default;
+    opacity: 0.7;
+}
+
+.grid-word-card.failed .grid-card-text {
+    color: var(--danger);
+    text-decoration: line-through;
+    text-decoration-thickness: 1.5px;
+}
+
+.grid-word-card.failed .grid-card-translation {
+    font-family: var(--font-body);
+    font-size: 0.75rem;
+    color: var(--danger);
+    font-style: italic;
+    opacity: 0.8;
+    margin-top: 0.15rem;
+}
+
+.grid-word-card.failed .grid-card-points {
+    opacity: 1;
+    color: var(--danger);
+}
+
+@keyframes gridSolve {
+    0% {
+        transform: scale(0.92);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+/* Input Overlay */
+.grid-input-overlay {
+    position: fixed;
+    inset: 0;
+    z-index: 200;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: rgba(8, 8, 16, 0.85);
+    backdrop-filter: blur(8px);
+    animation: overlayFadeIn 0.2s ease;
+}
+
+@keyframes overlayFadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.grid-input-card {
+    width: 90%;
+    max-width: 400px;
+    padding: 2rem;
+    background: linear-gradient(160deg, var(--surface) 0%, var(--surface-light) 100%);
+    border: 1px solid rgba(0, 240, 255, 0.12);
+    border-radius: var(--border-radius);
+    box-shadow: var(--shadow-lg), 0 0 60px rgba(0, 240, 255, 0.08);
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+    animation: cardPopIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes cardPopIn {
+    from {
+        transform: scale(0.9) translateY(10px);
+        opacity: 0;
+    }
+
+    to {
+        transform: scale(1) translateY(0);
+        opacity: 1;
+    }
+}
+
+.grid-input-header {
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.grid-input-lang {
+    font-family: var(--font-display);
+    font-size: 0.7rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--primary-light);
+}
+
+.grid-input-lang.turkish {
+    color: var(--secondary);
+}
+
+.grid-input-word {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--text-primary);
+    text-shadow: 0 0 20px rgba(0, 240, 255, 0.1);
+}
+
+.grid-input-attempts {
+    display: flex;
+    justify-content: center;
+    gap: 0.5rem;
+    font-size: 1.25rem;
+}
+
+.grid-input-attempts .attempt-heart {
+    transition: all 0.3s ease;
+}
+
+.grid-input-attempts .attempt-heart.lost {
+    opacity: 0.25;
+    transform: scale(0.8);
+    filter: grayscale(1);
+}
+
+.grid-input {
+    width: 100%;
+    padding: 0.9rem 1.5rem;
+    font-family: var(--font-body);
+    font-size: 1.15rem;
+    font-weight: 500;
+    background: var(--surface);
+    border: 1px solid rgba(0, 240, 255, 0.12);
+    border-radius: var(--border-radius-sm);
+    color: var(--text-primary);
+    text-align: center;
+    transition: all 0.25s ease;
+    outline: none;
+}
+
+.grid-input:focus {
+    border-color: var(--primary);
+    box-shadow: 0 0 20px rgba(0, 240, 255, 0.15);
+    background: var(--surface-light);
+}
+
+.grid-input::placeholder {
+    color: var(--text-muted);
+}
+
+.grid-input.shake {
+    animation: wrongShake 0.4s ease;
+    border-color: var(--danger);
+}
+
+.grid-input-actions {
+    display: flex;
+    gap: 0.75rem;
+}
+
+.grid-input-cancel {
+    flex: 1;
+    padding: 0.8rem;
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    font-weight: 600;
+    background: var(--surface);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--border-radius-sm);
+    color: var(--text-secondary);
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.grid-input-cancel:hover {
+    background: var(--surface-light);
+    color: var(--text-primary);
+}
+
+.grid-input-submit {
+    flex: 2;
+    padding: 0.8rem;
+    font-family: var(--font-display);
+    font-size: 0.9rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    border: none;
+    border-radius: var(--border-radius-sm);
+    color: var(--background);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 16px rgba(0, 240, 255, 0.25);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.grid-input-submit:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(0, 240, 255, 0.35);
+}
+
+.grid-input-feedback {
+    text-align: center;
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 600;
+    padding: 0.6rem;
+    border-radius: var(--border-radius-sm);
+    animation: feedbackPop 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.grid-input-feedback.correct {
+    background: rgba(0, 230, 118, 0.12);
+    border: 1px solid rgba(0, 230, 118, 0.3);
+    color: var(--success);
+}
+
+.grid-input-feedback.wrong {
+    background: rgba(255, 61, 90, 0.12);
+    border: 1px solid rgba(255, 61, 90, 0.3);
+    color: var(--danger);
+}
+
+/* Grid Game Score Stat */
+.grid-game-screen .stat-correct .stat-number {
+    color: var(--accent) !important;
+    text-shadow: 0 0 10px rgba(255, 184, 0, 0.3);
+}
+
+/* Grid Completion */
+.grid-completion {
+    text-align: center;
+    padding: 2rem;
+    margin-top: 1rem;
+}
+
+.grid-completion-title {
+    font-family: var(--font-display);
+    font-size: 2rem;
+    font-weight: 800;
+    color: var(--primary);
+    margin-bottom: 0.5rem;
+}
+
+.grid-completion-score {
+    font-family: var(--font-display);
+    font-size: 3.5rem;
+    font-weight: 900;
+    color: var(--accent);
+    text-shadow: 0 0 30px rgba(255, 184, 0, 0.4);
+}
+
+.grid-completion-detail {
+    font-size: 1rem;
+    color: var(--text-secondary);
+    margin-top: 0.5rem;
+}
+
+.grid-play-again-btn {
+    margin-top: 1.5rem;
+    padding: 0.9rem 2.5rem;
+    font-family: var(--font-display);
+    font-size: 1rem;
+    font-weight: 700;
+    background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+    border: none;
+    border-radius: var(--border-radius-sm);
+    color: var(--background);
+    cursor: pointer;
+    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    box-shadow: 0 4px 16px rgba(0, 240, 255, 0.25);
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.grid-play-again-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 24px rgba(0, 240, 255, 0.35);
+}
+
+/* Responsive Grid */
+@media (max-width: 480px) {
+    .grid-word-container {
+        gap: 0.5rem;
+    }
+
+    .grid-word-card {
+        padding: 1rem 0.5rem;
+        min-height: 75px;
+    }
+
+    .grid-word-card .grid-card-text {
+        font-size: 0.85rem;
+    }
+
+    .grid-input-word {
+        font-size: 1.6rem;
+    }
+}

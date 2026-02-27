@@ -68,6 +68,55 @@
                     <span class="mode-name">Cümle Tamamla</span>
                     <span class="mode-desc">Doğru kelimeyi bul!</span>
                 </button>
+
+                <button class="mode-btn" id="grid-mode-btn">
+                    <span class="mode-icon">🧩</span>
+                    <span class="mode-name">Kelime Avı</span>
+                    <span class="mode-desc">Grid'deki kelimeleri çevir!</span>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Grid Game Screen -->
+    <div class="grid-game-screen hidden" id="grid-game-screen">
+        <header class="game-header">
+            <div class="logo" id="grid-home-btn" style="cursor: pointer;">
+                <span class="logo-icon">⚡</span>
+                <span class="logo-text">BlitzFlash</span>
+            </div>
+            <div class="game-stats">
+                <div class="stat-item stat-correct">
+                    <span class="stat-number" id="grid-score">0</span>
+                    <span class="stat-label">⭐ Puan</span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-number" id="grid-progress">0/0</span>
+                    <span class="stat-label">İlerleme</span>
+                </div>
+            </div>
+        </header>
+        <button class="back-btn" id="grid-back-btn">← Geri</button>
+
+        <div class="grid-word-container" id="grid-word-container">
+            <!-- Word cards will be populated dynamically -->
+        </div>
+
+        <!-- Translation Input Modal -->
+        <div class="grid-input-overlay hidden" id="grid-input-overlay">
+            <div class="grid-input-card">
+                <div class="grid-input-header">
+                    <span class="grid-input-lang" id="grid-input-lang">English</span>
+                    <span class="grid-input-word" id="grid-input-word">Word</span>
+                </div>
+                <div class="grid-input-attempts" id="grid-input-attempts"></div>
+                <input type="text" class="grid-input" id="grid-input" placeholder="Çevirisini yaz..."
+                    autocomplete="off">
+                <div class="grid-input-actions">
+                    <button class="grid-input-cancel" id="grid-input-cancel">İptal</button>
+                    <button class="grid-input-submit" id="grid-input-submit">Kontrol Et</button>
+                </div>
+                <div class="grid-input-feedback hidden" id="grid-input-feedback"></div>
             </div>
         </div>
     </div>

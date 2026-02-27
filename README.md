@@ -39,6 +39,16 @@ Boşluklu İngilizce cümlelerde doğru kelimeyi 4 seçenek arasından bul.
 
 ![Cümle Tamamla](screenshots/cumle_tamamla.png)
 
+### 🧩 Kelime Avı
+3 sütunlu grid'de İngilizce ve Türkçe karışık kelimelerin çevirilerini yaz.
+
+- **30 kelime**, 3'erli sıralarla grid halinde dizilir
+- Her kelime rastgele İngilizce veya Türkçe gösterilir (EN/TR badge)
+- Kelimeye tıkla → açılan modalda çevirisini yaz
+- **3 hak (❤️❤️❤️)**: İlk seferde doğru = **+3 puan**, 1 yanlış sonra doğru = **+2**, 2 yanlış sonra doğru = **+1**
+- 3 hakkı da bitirirsen = **-1 puan** ve doğru cevap gösterilir
+- Doğru bilinen kartlar **yeşile** döner, başarısız olanlar **kırmızı** + üstü çizili olur
+
 ## 📊 Kelime Havuzu
 
 Toplam **790 kelime** — BBC 800 Essential Word List temel alınarak hazırlanmış, örnek cümleler ve Türkçe karşılıklarıyla birlikte.

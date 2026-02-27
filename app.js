@@ -784,3 +784,302 @@ sentenceOptions.addEventListener('click', (e) => {
         checkSentenceAnswer(index);
     }
 });
+
+// ===== GRID GAME MODE (Kelime Avı) =====
+const gridGameScreen = document.getElementById('grid-game-screen');
+const gridModeBtn = document.getElementById('grid-mode-btn');
+const gridHomeBtn = document.getElementById('grid-home-btn');
+const gridBackBtn = document.getElementById('grid-back-btn');
+const gridWordContainer = document.getElementById('grid-word-container');
+const gridScoreEl = document.getElementById('grid-score');
+const gridProgressEl = document.getElementById('grid-progress');
+const gridInputOverlay = document.getElementById('grid-input-overlay');
+const gridInputLang = document.getElementById('grid-input-lang');
+const gridInputWord = document.getElementById('grid-input-word');
+const gridInputAttempts = document.getElementById('grid-input-attempts');
+const gridInputEl = document.getElementById('grid-input');
+const gridInputCancel = document.getElementById('grid-input-cancel');
+const gridInputSubmit = document.getElementById('grid-input-submit');
+const gridInputFeedback = document.getElementById('grid-input-feedback');
+
+const GRID_WORD_COUNT = 30;
+const GRID_MAX_ATTEMPTS = 3;
+
+let gridWords = [];          // { wordObj, isEnglish, attempts, solved, cardEl }
+let gridScore = 0;
+let gridSolvedCount = 0;
+let gridActiveIndex = -1;    // currently open word index
+
+function startGridMode() {
+    modeScreen.classList.add('hidden');
+    gridGameScreen.classList.remove('hidden');
+
+    const allWords = shuffleArray([...getAllWords()]);
+    const selected = allWords.slice(0, GRID_WORD_COUNT);
+
+    gridWords = selected.map(wordObj => ({
+        wordObj,
+        isEnglish: Math.random() > 0.5,
+        attempts: 0,
+        solved: false,
+        failed: false,
+        cardEl: null
+    }));
+
+    gridScore = 0;
+    gridSolvedCount = 0;
+    gridActiveIndex = -1;
+    gridScoreEl.textContent = '0';
+    gridProgressEl.textContent = `0/${gridWords.length}`;
+
+    renderGridWords();
+}
+
+function renderGridWords() {
+    gridWordContainer.textContent = '';
+
+    gridWords.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'grid-word-card';
+        card.dataset.index = index;
+
+        const langBadge = document.createElement('span');
+        langBadge.className = `grid-card-lang ${item.isEnglish ? 'lang-en' : 'lang-tr'}`;
+        langBadge.textContent = item.isEnglish ? 'EN' : 'TR';
+
+        const text = document.createElement('span');
+        text.className = 'grid-card-text';
+        text.textContent = item.isEnglish ? item.wordObj.english : item.wordObj.turkish;
+
+        const points = document.createElement('span');
+        points.className = 'grid-card-points';
+        points.textContent = '+3 puan';
+
+        card.appendChild(langBadge);
+        card.appendChild(text);
+        card.appendChild(points);
+
+        card.addEventListener('click', () => openGridWord(index));
+
+        item.cardEl = card;
+        gridWordContainer.appendChild(card);
+    });
+}
+
+function openGridWord(index) {
+    const item = gridWords[index];
+    if (item.solved || item.failed) return;
+
+    gridActiveIndex = index;
+
+    // Set up modal
+    const isEn = item.isEnglish;
+    gridInputLang.textContent = isEn ? 'English → Türkçe yaz' : 'Türkçe → English yaz';
+    gridInputLang.classList.toggle('turkish', !isEn);
+    gridInputWord.textContent = isEn ? item.wordObj.english : item.wordObj.turkish;
+
+    // Render attempt hearts
+    renderAttemptHearts(item.attempts);
+
+    gridInputEl.value = '';
+    gridInputEl.classList.remove('shake');
+    gridInputFeedback.classList.add('hidden');
+    gridInputFeedback.classList.remove('correct', 'wrong');
+    gridInputOverlay.classList.remove('hidden');
+
+    setTimeout(() => gridInputEl.focus(), 100);
+}
+
+function renderAttemptHearts(usedAttempts) {
+    gridInputAttempts.textContent = '';
+    for (let i = 0; i < GRID_MAX_ATTEMPTS; i++) {
+        const heart = document.createElement('span');
+        heart.className = 'attempt-heart';
+        heart.textContent = '❤️';
+        if (i < usedAttempts) heart.classList.add('lost');
+        gridInputAttempts.appendChild(heart);
+    }
+}
+
+function closeGridInput() {
+    gridInputOverlay.classList.add('hidden');
+    gridActiveIndex = -1;
+}
+
+function checkGridAnswer() {
+    if (gridActiveIndex === -1) return;
+    const userAnswer = gridInputEl.value.trim();
+    if (!userAnswer) return;
+
+    const item = gridWords[gridActiveIndex];
+    const isEn = item.isEnglish;
+
+    // Determine correct answer
+    const correctAnswer = isEn ? item.wordObj.turkish : item.wordObj.english;
+    const normalizedUser = normalizeText(userAnswer);
+
+    // Check against all parts (handle "A / B / C" translations)
+    const correctParts = correctAnswer.split('/').map(p => normalizeText(p.trim()));
+    const isCorrect = correctParts.some(p => p === normalizedUser) ||
+        normalizeText(correctAnswer) === normalizedUser;
+
+    if (isCorrect) {
+        // Calculate points: remaining attempts = points
+        const pointsEarned = GRID_MAX_ATTEMPTS - item.attempts;
+        item.solved = true;
+        gridScore += pointsEarned;
+        gridSolvedCount++;
+
+        // Show feedback in modal
+        gridInputFeedback.textContent = `✓ Doğru! +${pointsEarned} puan`;
+        gridInputFeedback.classList.remove('hidden', 'wrong');
+        gridInputFeedback.classList.add('correct');
+
+        // Update card
+        updateGridCard(gridActiveIndex, pointsEarned);
+        updateGridStats();
+
+        // Close modal after delay
+        setTimeout(() => {
+            closeGridInput();
+            if (gridSolvedCount + countGridFailed() >= gridWords.length) {
+                showGridCompletion();
+            }
+        }, 800);
+    } else {
+        item.attempts++;
+        renderAttemptHearts(item.attempts);
+
+        if (item.attempts >= GRID_MAX_ATTEMPTS) {
+            // All attempts used — fail
+            item.failed = true;
+            gridScore -= 1;
+            gridSolvedCount; // don't increment
+
+            gridInputFeedback.textContent = `✗ Doğrusu: ${correctAnswer} (-1 puan)`;
+            gridInputFeedback.classList.remove('hidden', 'correct');
+            gridInputFeedback.classList.add('wrong');
+
+            updateGridCardFailed(gridActiveIndex, correctAnswer);
+            updateGridStats();
+
+            setTimeout(() => {
+                closeGridInput();
+                if (gridSolvedCount + countGridFailed() >= gridWords.length) {
+                    showGridCompletion();
+                }
+            }, 1500);
+        } else {
+            // Wrong but has attempts left
+            const remaining = GRID_MAX_ATTEMPTS - item.attempts;
+            gridInputFeedback.textContent = `✗ Yanlış! ${remaining} hak kaldı`;
+            gridInputFeedback.classList.remove('hidden', 'correct');
+            gridInputFeedback.classList.add('wrong');
+
+            gridInputEl.classList.add('shake');
+            gridInputEl.value = '';
+            setTimeout(() => gridInputEl.classList.remove('shake'), 400);
+        }
+    }
+}
+
+function countGridFailed() {
+    return gridWords.filter(w => w.failed).length;
+}
+
+function updateGridCard(index, points) {
+    const item = gridWords[index];
+    const card = item.cardEl;
+    card.classList.add('solved');
+
+    // Add translation below
+    const translation = document.createElement('span');
+    translation.className = 'grid-card-translation';
+    translation.textContent = item.isEnglish ? item.wordObj.turkish : item.wordObj.english;
+    card.appendChild(translation);
+
+    // Update points display
+    const pointsEl = card.querySelector('.grid-card-points');
+    pointsEl.textContent = `+${points}`;
+}
+
+function updateGridCardFailed(index, correctAnswer) {
+    const item = gridWords[index];
+    const card = item.cardEl;
+    card.classList.add('failed');
+
+    // Show correct answer
+    const translation = document.createElement('span');
+    translation.className = 'grid-card-translation';
+    translation.textContent = correctAnswer;
+    card.appendChild(translation);
+
+    // Update points display
+    const pointsEl = card.querySelector('.grid-card-points');
+    pointsEl.textContent = '-1';
+}
+
+function updateGridStats() {
+    gridScoreEl.textContent = gridScore;
+    const totalDone = gridSolvedCount + countGridFailed();
+    gridProgressEl.textContent = `${totalDone}/${gridWords.length}`;
+}
+
+function showGridCompletion() {
+    const failed = countGridFailed();
+    const completion = document.createElement('div');
+    completion.className = 'grid-completion';
+
+    const title = document.createElement('div');
+    title.className = 'grid-completion-title';
+    title.textContent = '🎉 Tebrikler!';
+
+    const score = document.createElement('div');
+    score.className = 'grid-completion-score';
+    score.textContent = `${gridScore} Puan`;
+
+    const detail = document.createElement('div');
+    detail.className = 'grid-completion-detail';
+    detail.textContent = `${gridSolvedCount} doğru, ${failed} başarısız`;
+
+    const playAgain = document.createElement('button');
+    playAgain.className = 'grid-play-again-btn';
+    playAgain.textContent = '🔄 Tekrar Oyna';
+    playAgain.addEventListener('click', startGridMode);
+
+    completion.appendChild(title);
+    completion.appendChild(score);
+    completion.appendChild(detail);
+    completion.appendChild(playAgain);
+
+    // Replace grid with completion
+    gridWordContainer.textContent = '';
+    gridWordContainer.style.display = 'block';
+    gridWordContainer.appendChild(completion);
+}
+
+function exitGridMode() {
+    gridGameScreen.classList.add('hidden');
+    gridInputOverlay.classList.add('hidden');
+    modeScreen.classList.remove('hidden');
+    gridWordContainer.style.display = '';
+}
+
+// Grid mode event listeners
+gridModeBtn.addEventListener('click', startGridMode);
+gridHomeBtn.addEventListener('click', exitGridMode);
+gridBackBtn.addEventListener('click', exitGridMode);
+gridInputCancel.addEventListener('click', closeGridInput);
+gridInputSubmit.addEventListener('click', checkGridAnswer);
+gridInputEl.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') {
+        e.preventDefault();
+        checkGridAnswer();
+    }
+});
+
+// Close overlay on backdrop click
+gridInputOverlay.addEventListener('click', (e) => {
+    if (e.target === gridInputOverlay) closeGridInput();
+});
+
