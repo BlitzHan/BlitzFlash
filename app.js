@@ -1,5 +1,6 @@
 // DOM Elements
 const flashcard = document.getElementById('flashcard');
+const cardInner = document.getElementById('card-inner');
 const englishWord = document.getElementById('english-word');
 const englishSentence = document.getElementById('english-sentence');
 const turkishWord = document.getElementById('turkish-word');
@@ -12,6 +13,11 @@ const progressText = document.getElementById('progress-text');
 const correctCount = document.getElementById('correct-count');
 const wrongCount = document.getElementById('wrong-count');
 const totalCount = document.getElementById('total-count');
+
+// Cached swipe indicator refs (F6 — avoid querySelectorAll in hot paths)
+const swipeIndicators = document.querySelectorAll('.swipe-indicator');
+const swipeLeftIndicator = document.querySelector('.swipe-indicator.swipe-left');
+const swipeRightIndicator = document.querySelector('.swipe-indicator.swipe-right');
 
 // Mode Selection Elements
 const modeScreen = document.getElementById('mode-screen');
@@ -26,17 +32,19 @@ let shuffledVocabulary = [];
 let gameMode = 'free';
 let isGameActive = false;
 
-// Combine all vocabulary
+// Combine all vocabulary (F1 — cached; word data is static at runtime)
+let _cachedAllWords = null;
 function getAllWords() {
-    let allWords = [...vocabulary];
-    if (typeof wordsPart1 !== 'undefined') allWords = allWords.concat(wordsPart1);
-    if (typeof wordsPart2 !== 'undefined') allWords = allWords.concat(wordsPart2);
-    if (typeof wordsPart3 !== 'undefined') allWords = allWords.concat(wordsPart3);
-    if (typeof wordsPart4 !== 'undefined') allWords = allWords.concat(wordsPart4);
-    if (typeof wordsPart5 !== 'undefined') allWords = allWords.concat(wordsPart5);
-    if (typeof wordsPart6 !== 'undefined') allWords = allWords.concat(wordsPart6);
-    if (typeof wordsPart7 !== 'undefined') allWords = allWords.concat(wordsPart7);
-    return allWords;
+    if (_cachedAllWords) return _cachedAllWords;
+    _cachedAllWords = [...vocabulary];
+    if (typeof wordsPart1 !== 'undefined') _cachedAllWords = _cachedAllWords.concat(wordsPart1);
+    if (typeof wordsPart2 !== 'undefined') _cachedAllWords = _cachedAllWords.concat(wordsPart2);
+    if (typeof wordsPart3 !== 'undefined') _cachedAllWords = _cachedAllWords.concat(wordsPart3);
+    if (typeof wordsPart4 !== 'undefined') _cachedAllWords = _cachedAllWords.concat(wordsPart4);
+    if (typeof wordsPart5 !== 'undefined') _cachedAllWords = _cachedAllWords.concat(wordsPart5);
+    if (typeof wordsPart6 !== 'undefined') _cachedAllWords = _cachedAllWords.concat(wordsPart6);
+    if (typeof wordsPart7 !== 'undefined') _cachedAllWords = _cachedAllWords.concat(wordsPart7);
+    return _cachedAllWords;
 }
 
 // Fisher-Yates shuffle
@@ -126,7 +134,6 @@ function swipeCard(direction) {
 
             // Snap card to front face instantly before showing new content
             // to prevent the next card's back face from being briefly visible
-            const cardInner = document.getElementById('card-inner');
             cardInner.style.transition = 'none';
             flashcard.classList.remove('flipped');
             // Force reflow so the instant snap takes effect
@@ -147,8 +154,8 @@ function showFreeCompletion() {
     isGameActive = false;
     const percentage = Math.round((correct / shuffledVocabulary.length) * 100);
 
-    englishWord.textContent = "🎉 Tebrikler!";
-    englishSentence.textContent = `Tüm kelimeleri tamamladın!`;
+    englishWord.textContent = '🎉 Tebrikler!';
+    englishSentence.textContent = 'Tüm kelimeleri tamamladın!';
     turkishWord.textContent = `Skor: %${percentage}`;
     turkishSentence.textContent = `${correct} doğru, ${wrong} yanlış`;
     flashcard.classList.remove('flipped');
@@ -242,14 +249,16 @@ document.addEventListener('mousemove', (e) => {
     flashcard.style.transform = `translateX(${diffX}px) rotate(${rotation}deg)`;
     flashcard.style.opacity = opacity;
 
-    // Show swipe indicators during drag
-    const indicators = document.querySelectorAll('.swipe-indicator');
+    // Show swipe indicators during drag (F6 — using cached refs)
     if (diffX > SWIPE_THRESHOLD) {
-        indicators.forEach(ind => ind.style.opacity = ind.classList.contains('swipe-right') ? '1' : '0');
+        swipeLeftIndicator.style.opacity = '0';
+        swipeRightIndicator.style.opacity = '1';
     } else if (diffX < -SWIPE_THRESHOLD) {
-        indicators.forEach(ind => ind.style.opacity = ind.classList.contains('swipe-left') ? '1' : '0');
+        swipeLeftIndicator.style.opacity = '1';
+        swipeRightIndicator.style.opacity = '0';
     } else {
-        indicators.forEach(ind => ind.style.opacity = '0');
+        swipeLeftIndicator.style.opacity = '0';
+        swipeRightIndicator.style.opacity = '0';
     }
 });
 
@@ -258,8 +267,8 @@ document.addEventListener('mouseup', () => {
     isDragging = false;
     const diffX = dragCurrentX - dragStartX;
 
-    // Reset swipe indicators
-    document.querySelectorAll('.swipe-indicator').forEach(ind => ind.style.opacity = '0');
+    // Reset swipe indicators (F6 — using cached refs)
+    swipeIndicators.forEach(ind => ind.style.opacity = '0');
 
     flashcard.style.transition = '';
     flashcard.style.transform = '';
@@ -292,6 +301,8 @@ const typingTimerDisplay = document.getElementById('typing-timer-display');
 const TYPING_GAME_DURATION_SECONDS = 60;
 const LEADERBOARD_STORAGE_KEY = 'blitzflash_leaderboard';
 const LEADERBOARD_MAX_ENTRIES = 10;
+const FEEDBACK_DELAY_MS_CORRECT = 1500;
+const FEEDBACK_DELAY_MS_WRONG = 3000;
 const typingLeaderboard = document.getElementById('typing-leaderboard');
 const leaderboardList = document.getElementById('leaderboard-list');
 const typingPlayAgainBtn = document.getElementById('typing-play-again-btn');
@@ -306,6 +317,7 @@ let typingTimerInterval = null;
 let typingTimeRemaining = TYPING_GAME_DURATION_SECONDS;
 let typingTimerStarted = false;
 let typingGameActive = false;
+let typingFeedbackTimeout = null; // F13 — cancelable timeout ref
 
 function startTypingMode() {
     modeScreen.classList.add('hidden');
@@ -345,19 +357,11 @@ function startTypingTimer() {
 
 function endTypingGame() {
     clearInterval(typingTimerInterval);
+    clearTimeout(typingFeedbackTimeout);
     typingGameActive = false;
     typingTimerDisplay.classList.remove('timer-warning');
 
-    typingWord.textContent = '⏱️ Süre Doldu!';
-    typingBadge.textContent = 'Bitti';
-    typingSentence.textContent = `Skorun: ${typingCorrect} doğru cevap!`;
-    typingInput.style.display = 'none';
-    typingSubmit.style.display = 'none';
-    typingFeedback.classList.remove('hidden', 'wrong');
-    typingFeedback.classList.add('correct');
-    feedbackIcon.textContent = '🏆';
-    feedbackText.textContent = `${typingCorrect} doğru, ${typingWrong} yanlış`;
-
+    showTypingEndScreen('⏱️ Süre Doldu!', '🏆', typingCorrect, typingWrong);
     saveLeaderboardScore(typingCorrect, typingWrong);
     showLeaderboard();
 }
@@ -391,15 +395,13 @@ function displayTypingWord() {
     typingProgressText.textContent = `${typingCurrentIndex + 1} / ${typingShuffledWords.length}`;
 }
 
+// F8 — single-pass Turkish normalization using char map
+const TURKISH_CHAR_MAP = { 'ı': 'i', 'ğ': 'g', 'ü': 'u', 'ş': 's', 'ö': 'o', 'ç': 'c' };
+const TURKISH_CHAR_REGEX = /[ığüşöç]/g;
+
 function normalizeText(text) {
-    // Normalize for comparison: lowercase, trim, handle Turkish characters
     return text.toLowerCase().trim()
-        .replace(/ı/g, 'i')
-        .replace(/ğ/g, 'g')
-        .replace(/ü/g, 'u')
-        .replace(/ş/g, 's')
-        .replace(/ö/g, 'o')
-        .replace(/ç/g, 'c')
+        .replace(TURKISH_CHAR_REGEX, ch => TURKISH_CHAR_MAP[ch])
         .replace(/[^\w\s]/g, ''); // Remove punctuation
 }
 
@@ -453,43 +455,47 @@ function showTypingFeedback(isCorrect, correctAnswer) {
         typingWrongCount.textContent = typingWrong;
     }
 
-    // Show both English and Turkish on the card
+    // Show both English and Turkish on the card (F4 — safe DOM construction)
     typingBadge.textContent = '🇬🇧 / 🇹🇷';
     typingBadge.classList.remove('turkish');
-    typingWord.innerHTML = `${typingCurrentWord.english} <span style="color: var(--text-muted); font-size: 0.5em; vertical-align: middle;">→</span> ${typingCurrentWord.turkish}`;
-    typingSentence.innerHTML = `${typingCurrentWord.englishSentence}<br><span style="color: var(--secondary); font-style: normal;">🇹🇷 ${typingCurrentWord.turkishSentence}</span>`;
+    typingWord.textContent = `${typingCurrentWord.english} → ${typingCurrentWord.turkish}`;
+    typingSentence.textContent = `${typingCurrentWord.englishSentence} | 🇹🇷 ${typingCurrentWord.turkishSentence}`;
 
-    const FEEDBACK_DELAY_MS_CORRECT = 1500;
-    const FEEDBACK_DELAY_MS_WRONG = 3000;
-
-    // Move to next word after delay
-    setTimeout(() => {
+    // F13 — cancelable timeout to prevent race on mode exit
+    clearTimeout(typingFeedbackTimeout);
+    typingFeedbackTimeout = setTimeout(() => {
         typingCurrentIndex++;
         displayTypingWord();
     }, isCorrect ? FEEDBACK_DELAY_MS_CORRECT : FEEDBACK_DELAY_MS_WRONG);
 }
 
-function showTypingCompletion() {
-    clearInterval(typingTimerInterval);
-    typingGameActive = false;
-    typingTimerDisplay.classList.remove('timer-warning');
-
-    typingWord.textContent = '🎉 Tebrikler!';
+// F5 — shared typing end screen to avoid duplication
+function showTypingEndScreen(title, icon, correctCnt, wrongCnt) {
+    typingWord.textContent = title;
     typingBadge.textContent = 'Bitti';
-    typingSentence.textContent = `Skorun: ${typingCorrect} doğru cevap!`;
+    typingSentence.textContent = `Skorun: ${correctCnt} doğru cevap!`;
     typingInput.style.display = 'none';
     typingSubmit.style.display = 'none';
     typingFeedback.classList.remove('hidden', 'wrong');
     typingFeedback.classList.add('correct');
-    feedbackIcon.textContent = '⭐';
-    feedbackText.textContent = `${typingCorrect} doğru, ${typingWrong} yanlış`;
+    feedbackIcon.textContent = icon;
+    feedbackText.textContent = `${correctCnt} doğru, ${wrongCnt} yanlış`;
+}
 
+function showTypingCompletion() {
+    clearInterval(typingTimerInterval);
+    clearTimeout(typingFeedbackTimeout);
+    typingGameActive = false;
+    typingTimerDisplay.classList.remove('timer-warning');
+
+    showTypingEndScreen('🎉 Tebrikler!', '⭐', typingCorrect, typingWrong);
     saveLeaderboardScore(typingCorrect, typingWrong);
     showLeaderboard();
 }
 
 function exitTypingMode() {
     clearInterval(typingTimerInterval);
+    clearTimeout(typingFeedbackTimeout); // F13
     typingGameActive = false;
     typingTimerDisplay.classList.remove('timer-warning');
     typingGameScreen.classList.add('hidden');
@@ -519,13 +525,25 @@ function saveLeaderboardScore(correctCount, wrongCount) {
     localStorage.setItem(LEADERBOARD_STORAGE_KEY, JSON.stringify(trimmed));
 }
 
+// F4 — leaderboard built with safe DOM API instead of innerHTML
+const RANK_MEDALS = ['🥇', '🥈', '🥉'];
+
+function createSpan(className, text) {
+    const span = document.createElement('span');
+    span.className = className;
+    span.textContent = text;
+    return span;
+}
+
 function showLeaderboard() {
     const scores = getLeaderboardScores();
-    const RANK_MEDALS = ['🥇', '🥈', '🥉'];
-    leaderboardList.innerHTML = '';
+    leaderboardList.textContent = '';
 
     if (scores.length === 0) {
-        leaderboardList.innerHTML = '<p class="leaderboard-empty">Henüz skor yok</p>';
+        const emptyMsg = document.createElement('p');
+        emptyMsg.className = 'leaderboard-empty';
+        emptyMsg.textContent = 'Henüz skor yok';
+        leaderboardList.appendChild(emptyMsg);
     } else {
         scores.forEach((entry, index) => {
             const row = document.createElement('div');
@@ -533,13 +551,10 @@ function showLeaderboard() {
             if (index < 3) row.classList.add('leaderboard-top');
 
             const rankIcon = index < RANK_MEDALS.length ? RANK_MEDALS[index] : `${index + 1}.`;
-
-            row.innerHTML = `
-                <span class="lb-rank">${rankIcon}</span>
-                <span class="lb-score">${entry.score} doğru</span>
-                <span class="lb-wrong">${entry.wrong} yanlış</span>
-                <span class="lb-date">${entry.date}</span>
-            `;
+            row.appendChild(createSpan('lb-rank', rankIcon));
+            row.appendChild(createSpan('lb-score', `${entry.score} doğru`));
+            row.appendChild(createSpan('lb-wrong', `${entry.wrong} yanlış`));
+            row.appendChild(createSpan('lb-date', entry.date));
             leaderboardList.appendChild(row);
         });
     }
@@ -613,19 +628,37 @@ function displaySentenceQuestion() {
     const sentence = sentenceCurrentWord.englishSentence;
     const word = sentenceCurrentWord.english;
 
-    // Replace the word with a blank
+    // Replace the word with a blank (F4 — build blank via DOM, not innerHTML)
     const regex = new RegExp(`\\b${word}\\b`, 'gi');
-    const blankSentence = sentence.replace(regex, '<span class="blank">_____</span>');
-    sentenceText.innerHTML = blankSentence;
+    const parts = sentence.split(regex);
+    sentenceText.textContent = '';
+    parts.forEach((part, i) => {
+        sentenceText.appendChild(document.createTextNode(part));
+        if (i < parts.length - 1) {
+            const blankSpan = document.createElement('span');
+            blankSpan.className = 'blank';
+            blankSpan.textContent = '_____';
+            sentenceText.appendChild(blankSpan);
+        }
+    });
 
     // Generate options (1 correct + 3 random wrong)
     const optionData = generateSentenceOptions(word);
     sentenceCorrectOptionIndex = optionData.correctIndex;
 
+    // F4 — build option content via DOM API
     const optionBtns = sentenceOptions.querySelectorAll('.option-btn');
     optionBtns.forEach((btn, i) => {
         const opt = optionData.options[i];
-        btn.innerHTML = `<span class="option-english">${opt.english}</span><span class="option-turkish hidden">${opt.turkish}</span>`;
+        btn.textContent = '';
+        const engSpan = document.createElement('span');
+        engSpan.className = 'option-english';
+        engSpan.textContent = opt.english;
+        const trSpan = document.createElement('span');
+        trSpan.className = 'option-turkish hidden';
+        trSpan.textContent = opt.turkish;
+        btn.appendChild(engSpan);
+        btn.appendChild(trSpan);
         btn.classList.remove('correct', 'wrong');
         btn.disabled = false;
     });
@@ -636,46 +669,37 @@ function displaySentenceQuestion() {
     sentenceProgressText.textContent = `${sentenceCurrentIndex + 1} / ${sentenceShuffledWords.length}`;
 }
 
+// F2 — deterministic option generation (no retry loop)
 function generateSentenceOptions(correctWord) {
-    // Get 3 random wrong options from vocabulary
-    const wrongWordObjects = [];
     const allWords = getAllWords();
-
-    // Find the correct word object
     const correctWordObj = allWords.find(w => w.english === correctWord);
 
-    while (wrongWordObjects.length < 3) {
-        const randomIndex = Math.floor(Math.random() * allWords.length);
-        const randomWordObj = allWords[randomIndex];
-
-        if (randomWordObj.english !== correctWord && !wrongWordObjects.some(w => w.english === randomWordObj.english)) {
-            wrongWordObjects.push(randomWordObj);
-        }
-    }
-
-    // Combine and shuffle
-    const allOptionObjects = [correctWordObj, ...wrongWordObjects];
-
-    // Shuffle options
-    for (let i = allOptionObjects.length - 1; i > 0; i--) {
+    // Filter out correct word, then Fisher-Yates partial shuffle to pick 3
+    const pool = allWords.filter(w => w.english !== correctWord);
+    const DISTRACTOR_COUNT = 3;
+    for (let i = pool.length - 1; i > pool.length - 1 - DISTRACTOR_COUNT && i > 0; i--) {
         const j = Math.floor(Math.random() * (i + 1));
-        [allOptionObjects[i], allOptionObjects[j]] = [allOptionObjects[j], allOptionObjects[i]];
+        [pool[i], pool[j]] = [pool[j], pool[i]];
     }
+    const wrongWordObjects = pool.slice(-DISTRACTOR_COUNT);
 
-    // Find correct index after shuffle
+    // F12 — reuse existing shuffleArray instead of inline shuffle
+    const allOptionObjects = shuffleArray([correctWordObj, ...wrongWordObjects]);
     const correctIndex = allOptionObjects.findIndex(w => w.english === correctWord);
 
-    return {
-        options: allOptionObjects,
-        correctIndex: correctIndex
-    };
+    return { options: allOptionObjects, correctIndex };
 }
+
+// F14 — consolidated correct/wrong handling
+const SENTENCE_DELAY_CORRECT = 1500;
+const SENTENCE_DELAY_WRONG = 2500;
 
 function checkSentenceAnswer(selectedIndex) {
     if (!sentenceCanClick) return;
     sentenceCanClick = false;
 
     const optionBtns = sentenceOptions.querySelectorAll('.option-btn');
+    const isCorrect = selectedIndex === sentenceCorrectOptionIndex;
 
     // Disable all buttons and show Turkish translations
     optionBtns.forEach(btn => {
@@ -684,57 +708,52 @@ function checkSentenceAnswer(selectedIndex) {
         if (turkishSpan) turkishSpan.classList.remove('hidden');
     });
 
-    if (selectedIndex === sentenceCorrectOptionIndex) {
-        // Correct answer
-        optionBtns[selectedIndex].classList.add('correct');
+    // Mark selected + correct buttons
+    optionBtns[selectedIndex].classList.add(isCorrect ? 'correct' : 'wrong');
+    if (!isCorrect) optionBtns[sentenceCorrectOptionIndex].classList.add('correct');
+
+    // Update score
+    if (isCorrect) {
         sentenceCorrect++;
         sentenceCorrectCountEl.textContent = sentenceCorrect;
-
-        // Fill in the blank with correct word
-        const blank = sentenceText.querySelector('.blank');
-        if (blank) {
-            blank.textContent = sentenceCurrentWord.english;
-            blank.classList.add('filled');
-        }
-
-        // Show Turkish translation with TR flag on left
-        sentenceTranslation.innerHTML = `<span class="tr-flag">🇹🇷</span>${sentenceCurrentWord.turkishSentence}`;
-        sentenceTranslation.classList.remove('hidden');
-
-        setTimeout(() => {
-            sentenceCurrentIndex++;
-            displaySentenceQuestion();
-        }, 1500);
     } else {
-        // Wrong answer
-        optionBtns[selectedIndex].classList.add('wrong');
-        optionBtns[sentenceCorrectOptionIndex].classList.add('correct');
         sentenceWrong++;
         sentenceWrongCountEl.textContent = sentenceWrong;
-
-        // Fill in blank with correct word
-        const blank = sentenceText.querySelector('.blank');
-        if (blank) {
-            blank.textContent = sentenceCurrentWord.english;
-            blank.classList.add('filled');
-        }
-
-        // Show Turkish translation with TR flag on left
-        sentenceTranslation.innerHTML = `<span class="tr-flag">🇹🇷</span>${sentenceCurrentWord.turkishSentence}`;
-        sentenceTranslation.classList.remove('hidden');
-
-        setTimeout(() => {
-            sentenceCurrentIndex++;
-            displaySentenceQuestion();
-        }, 2500);
     }
+
+    // Fill in the blank with correct word
+    const blank = sentenceText.querySelector('.blank');
+    if (blank) {
+        blank.textContent = sentenceCurrentWord.english;
+        blank.classList.add('filled');
+    }
+
+    // F4 — show Turkish translation with TR flag via safe DOM
+    sentenceTranslation.textContent = '';
+    const flagSpan = document.createElement('span');
+    flagSpan.className = 'tr-flag';
+    flagSpan.textContent = '🇹🇷';
+    sentenceTranslation.appendChild(flagSpan);
+    sentenceTranslation.appendChild(document.createTextNode(sentenceCurrentWord.turkishSentence));
+    sentenceTranslation.classList.remove('hidden');
+
+    setTimeout(() => {
+        sentenceCurrentIndex++;
+        displaySentenceQuestion();
+    }, isCorrect ? SENTENCE_DELAY_CORRECT : SENTENCE_DELAY_WRONG);
 }
 
+// F4 — safe DOM construction for completion screen
 function showSentenceCompletion() {
-    sentenceText.innerHTML = `🎉 Tebrikler! <br><small>${sentenceCorrect} doğru, ${sentenceWrong} yanlış - Puan: ${sentenceCorrect * 10}</small>`;
+    sentenceText.textContent = '';
+    sentenceText.appendChild(document.createTextNode('🎉 Tebrikler!'));
+    sentenceText.appendChild(document.createElement('br'));
+    const small = document.createElement('small');
+    small.textContent = `${sentenceCorrect} doğru, ${sentenceWrong} yanlış - Puan: ${sentenceCorrect * 10}`;
+    sentenceText.appendChild(small);
 
     const optionBtns = sentenceOptions.querySelectorAll('.option-btn');
-    optionBtns.forEach((btn, i) => {
+    optionBtns.forEach(btn => {
         btn.style.display = 'none';
         btn.disabled = true;
     });
